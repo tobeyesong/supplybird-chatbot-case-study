@@ -5,36 +5,31 @@
 The chatbot is not the product. The product is the lead-response system around it:
 
 ```text
-Better estimate intake -> faster qualification -> cleaner follow-up -> more quote-ready opportunities
+Simple contact capture -> faster reply -> cleaner follow-up -> more quote-ready opportunities
 ```
 
-The current Chatway-style widget is useful as a visible chat/contact channel, but it mostly captures contact details and routes buyers to live chat or WhatsApp. The opportunity is to capture the details SupplyBird needs before a buyer becomes estimate-ready.
+The current Chatway-style widget is useful as a visible chat/contact channel. For this prototype, the better move is to keep the consumer chatbot simple: phone number, email, message, and product context when available.
 
 ## Blueprint
 
 ```text
 Traffic source
 -> Chatway/custom website widget
--> scripted estimate qualification
+-> simple message capture
 -> lead database / CRM
 -> notification + follow-up automation
 -> dashboard / pipeline
 -> human sales handoff
 ```
 
-## SupplyBird Qualification Flow
+## SupplyBird Message Flow
 
-Minimum estimate-ready fields:
+Minimum message fields:
 
-- project type: flooring, decking, roofing, window, appliance, other
-- product or material interest
-- square footage, linear footage, or quantity
-- timeline: today, this week, this month, just researching
-- pickup or delivery
-- project location or ZIP code
-- budget range, if relevant
-- name, phone, and email
-- optional photos or notes
+- phone number
+- email
+- message
+- product context, if the message starts from a product card
 - recommended next step
 
 ## V1 Case-Study Build
@@ -43,14 +38,14 @@ Use the current prototype:
 
 ```text
 React + Tailwind
-+ scripted estimate assistant
-+ generated lead summary
++ simple message assistant
++ consumer product calculator
 + Firebase/Google auth hook with demo owner mode
 + localStorage lead dashboard and editable product records
 + case-study explanation
 ```
 
-This shows the core business proof: vague product interest can become a structured lead.
+This shows the core business proof: a shopper can calculate boxes, send a short message, and land in the seller dashboard.
 
 ## Owner Dashboard Requirements
 

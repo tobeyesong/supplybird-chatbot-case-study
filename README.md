@@ -1,25 +1,24 @@
 # SupplyBird Chatbot Case Study Prototype
 
-React + TypeScript + Tailwind prototype for a SupplyBird buyer-response and estimate-intake workflow.
+React + TypeScript + Tailwind prototype for a SupplyBird buyer-response workflow.
 
 ## What It Validates
 
-This prototype tests whether a narrow chatbot-style assistant can improve speed-to-lead for a local building-supplies store. The assistant is tied to catalog browsing and captures structured estimate details before staff follow up:
+This prototype tests whether a simple chatbot-style message drawer can improve speed-to-lead for a local building-supplies store. The assistant is tied to catalog browsing and captures only the information needed to reply:
 
-- project type and product interest
-- square footage, linear footage, or quantity
-- urgency and pickup or delivery preference
-- location, budget, contact information, and notes
-- a recommended next step for the seller dashboard
+- phone number
+- email
+- customer message
+- optional product context from the catalog
 
-The point is practical lead qualification, not AI novelty.
+The calculator handles product math for the consumer. The chatbot stays intentionally simple.
 
 ## Prototype Surface
 
 - Storefront/catalog home using SupplyBird-style categories and live-site business details
 - Seeded inventory for flooring, decking, roofing, windows, appliances, and other supplies
 - Search and filters for category, availability, price range, and project type
-- Project Estimate Assistant drawer with a scripted qualification flow
+- Simple message drawer with phone, email, message, and thank-you confirmation
 - LocalStorage lead persistence
 - Google-gated seller/admin dashboard with demo owner mode
 - Lead status changes for `new`, `contacted`, `quoted`, `won`, and `lost`
@@ -80,8 +79,8 @@ http://localhost:5173/
 1. Browse the inventory grid.
 2. Click `Details / calculator` on a flooring product and enter total square footage.
 3. Confirm the calculator uses the product's `sq.ft. per box/case` field to recommend boxes.
-4. Click `Ask / Get estimate` on a product card.
-5. Complete the Project Estimate Assistant steps.
-6. Save the lead.
+4. Click `Send message` on a product card.
+5. Enter phone number, email, and message.
+6. Confirm the final message says `Okay, thank you for your message. We will reply shortly.`
 7. Confirm the new lead appears in the dashboard.
 8. In demo owner mode, edit a listing and confirm coverage/stock fields are available.

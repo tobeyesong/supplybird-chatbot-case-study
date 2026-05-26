@@ -34,12 +34,10 @@ import {
   projectTypes,
   seededLeads,
   type Availability,
-  type Fulfillment,
   type Lead,
   type LeadStatus,
   type Product,
   type ProjectType,
-  type Timeline,
 } from './data'
 import { auth, googleProvider, isFirebaseConfigured } from './firebase'
 
@@ -54,36 +52,14 @@ type OwnerSession = {
   mode: 'google' | 'demo'
 }
 
-type AssistantDraft = {
-  projectType: ProjectType
-  productInterest: string
-  estimatedQuantity: string
-  urgency: Timeline
-  fulfillment: Fulfillment
-  location: string
-  budget: string
-  contactName: string
-  contactMethod: string
-  notes: string
-}
-
-const defaultDraft: AssistantDraft = {
-  projectType: 'flooring',
-  productInterest: '',
-  estimatedQuantity: '',
-  urgency: 'this week',
-  fulfillment: 'pickup',
-  location: '43055',
-  budget: '',
-  contactName: '',
-  contactMethod: '',
-  notes: '',
+type ContactDraft = {
+  phone: string
+  email: string
+  message: string
 }
 
 const availabilityOptions: Availability[] = ['In stock', 'Low stock', 'Special order']
 const statusOptions: LeadStatus[] = ['new', 'contacted', 'quoted', 'won', 'lost']
-const timelineOptions: Timeline[] = ['today', 'this week', 'this month', 'just researching']
-const fulfillmentOptions: Fulfillment[] = ['pickup', 'delivery']
 const allowedOwnerEmails = ['toanlam01@gmail.com', 'owner@supplybird.net']
 
 const categoryDescriptions = {
@@ -211,22 +187,6 @@ function priorityClasses(priority: string) {
   return 'bg-slate-100 text-slate-700 ring-slate-600/10'
 }
 
-function recommendedNextStep(draft: AssistantDraft) {
-  if (draft.urgency === 'today') {
-    return 'Call now, confirm availability, and reserve the matching material.'
-  }
-
-  if (draft.fulfillment === 'delivery') {
-    return 'Prepare a material count and delivery quote for the requested location.'
-  }
-
-  if (draft.urgency === 'just researching') {
-    return 'Send product options and ask whether measurements or photos are available.'
-  }
-
-  return 'Confirm quantity, quote the closest in-stock option, and schedule follow-up.'
-}
-
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -234,71 +194,6 @@ function formatDate(value: string) {
     hour: 'numeric',
     minute: '2-digit',
   }).format(new Date(value))
-}
-
-function normalizeProjectType(value: string): ProjectType {
-  const normalized = value.toLowerCase()
-
-  if (normalized.includes('deck')) {
-    return 'decking'
-  }
-
-  if (normalized.includes('roof')) {
-    return 'roofing'
-  }
-
-  if (normalized.includes('window')) {
-    return 'window'
-  }
-
-  if (normalized.includes('appliance')) {
-    return 'appliance'
-  }
-
-  if (normalized.includes('floor') || normalized.includes('vinyl') || normalized.includes('laminate')) {
-    return 'flooring'
-  }
-
-  return projectTypes.find((type) => type === normalized) ?? 'other'
-}
-
-function normalizeTimeline(value: string): Timeline {
-  const normalized = value.toLowerCase()
-
-  if (normalized.includes('today')) {
-    return 'today'
-  }
-
-  if (normalized.includes('week')) {
-    return 'this week'
-  }
-
-  if (normalized.includes('research')) {
-    return 'just researching'
-  }
-
-  return 'this month'
-}
-
-function normalizeFulfillment(value: string): Fulfillment {
-  return value.toLowerCase().includes('deliver') ? 'delivery' : 'pickup'
-}
-
-function parseContact(value: string) {
-  const [name, ...contactParts] = value.split(',')
-  const contact = contactParts.join(',').trim()
-
-  if (contact) {
-    return {
-      contactName: name.trim(),
-      contactMethod: contact,
-    }
-  }
-
-  return {
-    contactName: '',
-    contactMethod: value.trim(),
-  }
 }
 
 function Header({ onOpenAssistant }: { onOpenAssistant: () => void }) {
@@ -355,7 +250,7 @@ function Header({ onOpenAssistant }: { onOpenAssistant: () => void }) {
             className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
           >
             <MessageSquareText className="size-4" aria-hidden="true" />
-            Estimate Assistant
+            Message SupplyBird
           </button>
           <button
             type="button"
@@ -524,9 +419,9 @@ function FilterPanel({
       </div>
 
       <div className="mt-4 rounded-lg bg-slate-950 p-4 text-white shadow-sm">
-        <p className="text-sm font-semibold">Need an estimate?</p>
+        <p className="text-sm font-semibold">Need help?</p>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          Capture product, quantity, timeline, pickup or delivery, location, and contact details before staff follow up.
+          Send a message with your phone number and email. SupplyBird will reply shortly.
         </p>
         <button
           type="button"
@@ -534,7 +429,7 @@ function FilterPanel({
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-yellow-300 px-3 py-2.5 text-sm font-semibold text-slate-950 hover:bg-yellow-200"
         >
           <MessageSquareText className="size-4" aria-hidden="true" />
-          Start intake
+          Send message
         </button>
       </div>
     </aside>
@@ -672,7 +567,7 @@ function ProductGrid({
                   className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
                 >
                   <MessageSquareText className="size-4" aria-hidden="true" />
-                  Ask / Get estimate
+                  Send message
                 </button>
               </div>
             </div>
@@ -937,7 +832,7 @@ function ProductDetailDrawer({
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
             >
               <MessageSquareText className="size-4" aria-hidden="true" />
-              Ask / Get estimate
+              Send message
             </button>
           </div>
         </div>
@@ -972,8 +867,8 @@ function LeadDashboard({
               Lead dashboard
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-              Captured estimate requests are structured for follow-up: intent, quantity, urgency, fulfillment, location,
-              contact, and next step.
+              Captured customer messages are routed into the dashboard with phone, email, product context, and the next
+              follow-up step.
             </p>
           </div>
           <div className="space-y-3">
@@ -1712,16 +1607,16 @@ function CaseStudySection() {
       label: 'Before',
       steps: [
         'Buyer asks if material is available',
-        'Staff asks for size, quantity, timing, and delivery details',
-        'Quote waits until enough context is collected',
+        'Staff needs a phone or email before they can reply',
+        'Message gets lost between chat, text, and live follow-up',
       ],
     },
     {
       label: 'After',
       steps: [
-        'Buyer picks product or project type',
-        'Assistant captures estimate-ready details',
-        'Lead lands in dashboard with urgency and next step',
+        'Buyer uses the product calculator or picks an item',
+        'Assistant asks only for phone, email, and message',
+        'Message lands in the dashboard for human follow-up',
       ],
     },
   ]
@@ -1742,7 +1637,7 @@ function CaseStudySection() {
     {
       title: 'Case-study prototype',
       icon: Layers3,
-      body: 'The scripted React assistant captures project type, material interest, quantity, urgency, fulfillment, location, budget, contact, notes, and a next step.',
+      body: 'The React assistant stays intentionally simple: phone number, email, message, and optional product context from the catalog.',
     },
     {
       title: 'Pilot data layer',
@@ -1863,196 +1758,64 @@ function AssistantDrawer({
   open,
   source,
   product,
-  products,
   onClose,
   onSubmitLead,
 }: {
   open: boolean
   source: AssistantSource
   product: Product | null
-  products: Product[]
   onClose: () => void
   onSubmitLead: (lead: Lead) => void
 }) {
-  const [step, setStep] = useState(0)
-  const [reply, setReply] = useState('')
-  const [draft, setDraft] = useState<AssistantDraft>(() => ({
-    ...defaultDraft,
-    projectType: product?.projectType ?? 'flooring',
-    productInterest: product?.name ?? '',
+  const [draft, setDraft] = useState<ContactDraft>(() => ({
+    phone: '',
+    email: '',
+    message: product ? `Hi, I'm interested in ${product.name}.` : '',
   }))
-  const [submittedLead, setSubmittedLead] = useState<Lead | null>(null)
+  const [submitted, setSubmitted] = useState(false)
 
-  const matchingProducts = products.filter((item) => item.projectType === draft.projectType)
-
-  const buildLead = (leadDraft: AssistantDraft, createdAt: string): Lead => ({
+  const buildLead = (contactDraft: ContactDraft, createdAt: string): Lead => ({
     id: `lead-${createdAt}`,
     createdAt,
     source,
     status: 'new',
-    projectType: leadDraft.projectType,
-    productInterest: leadDraft.productInterest || `${leadDraft.projectType} project`,
-    estimatedQuantity: leadDraft.estimatedQuantity,
-    urgency: leadDraft.urgency,
-    fulfillment: leadDraft.fulfillment,
-    location: leadDraft.location,
-    budget: leadDraft.budget || 'not provided',
-    contactName: leadDraft.contactName || 'Name pending',
-    contactMethod: leadDraft.contactMethod || 'Contact pending',
-    notes: leadDraft.notes,
-    recommendedNextStep: recommendedNextStep(leadDraft),
+    projectType: product?.projectType ?? 'other',
+    productInterest: product?.name ?? 'Website message',
+    estimatedQuantity: '',
+    urgency: 'today',
+    fulfillment: 'pickup',
+    location: '',
+    budget: 'not provided',
+    contactName: 'Website visitor',
+    contactMethod: `Phone: ${contactDraft.phone.trim()} · Email: ${contactDraft.email.trim()}`,
+    notes: contactDraft.message.trim(),
+    recommendedNextStep: 'Reply to the visitor by phone or email.',
   })
 
-  const questions = [
-    {
-      id: 'project',
-      prompt: product
-        ? `I can help price out ${product.name}. What kind of project is this for?`
-        : 'What are you working on today?',
-      helper: 'Pick the closest option so I can ask the right estimate questions.',
-      quickReplies: projectTypes.map((type) => type),
-      placeholder: 'Type a project type',
-      answer: draft.projectType,
-      apply: (value: string) => {
-        const nextProjectType = normalizeProjectType(value)
-
-        return {
-          projectType: nextProjectType,
-          productInterest: product?.projectType === nextProjectType ? (product?.name ?? '') : '',
-        }
-      },
-    },
-    {
-      id: 'product',
-      prompt: 'What material or product are you interested in?',
-      helper: matchingProducts.length
-        ? 'You can choose an inventory item or describe what the buyer is asking about.'
-        : 'Describe the item, brand, material, color, or category as clearly as possible.',
-      suggestions: matchingProducts.map((item) => ({
-        label: item.name,
-        value: item.name,
-        meta: item.priceLabel,
-      })),
-      placeholder: 'Example: rustic oak vinyl, charcoal shingles',
-      answer: draft.productInterest,
-      apply: (value: string) => ({ productInterest: value }),
-    },
-    {
-      id: 'quantity',
-      prompt: 'About how much do you need?',
-      helper: 'Square footage, linear footage, bundle count, board count, or unit count is enough for a first pass.',
-      quickReplies: ['500 sq.ft.', '875 sq.ft.', '1,200 sq.ft.', '3 units'],
-      placeholder: 'Example: 900 sq.ft., 420 linear feet, 3 units',
-      answer: draft.estimatedQuantity,
-      apply: (value: string) => ({ estimatedQuantity: value }),
-    },
-    {
-      id: 'timeline',
-      prompt: 'How soon do you need it?',
-      helper: 'This drives lead priority and how quickly the team should follow up.',
-      quickReplies: timelineOptions.map((timeline) => timeline),
-      placeholder: 'Type a timeline',
-      answer: draft.urgency,
-      apply: (value: string) => ({ urgency: normalizeTimeline(value) }),
-    },
-    {
-      id: 'fulfillment',
-      prompt: 'Are you planning pickup or delivery?',
-      helper: 'Delivery usually needs location and scheduling details before quoting.',
-      quickReplies: fulfillmentOptions.map((option) => option),
-      placeholder: 'Pickup or delivery',
-      answer: draft.fulfillment,
-      apply: (value: string) => ({ fulfillment: normalizeFulfillment(value) }),
-    },
-    {
-      id: 'location',
-      prompt: 'What ZIP code or city is the project in?',
-      helper: 'Newark-area leads can usually be routed faster, especially if delivery is requested.',
-      quickReplies: ['Newark, OH 43055', 'Heath, OH 43056', 'Granville, OH 43023'],
-      placeholder: 'Example: Newark, OH 43055',
-      answer: draft.location,
-      apply: (value: string) => ({ location: value }),
-    },
-    {
-      id: 'budget',
-      prompt: 'Do you have a budget range in mind?',
-      helper: 'Optional, but it helps staff recommend the right material tier.',
-      quickReplies: ['Under $500', '$500 - $1,000', '$1,000 - $2,500', '$2,500+'],
-      placeholder: 'Example: $1,000 - $1,500',
-      optional: true,
-      answer: draft.budget || 'Not provided',
-      apply: (value: string) => ({ budget: value === 'Skip' ? '' : value }),
-    },
-    {
-      id: 'contact',
-      prompt: 'Who should SupplyBird follow up with?',
-      helper: 'Send name and best phone or email in one message.',
-      quickReplies: ['Demo Buyer, (740) 555-0199'],
-      placeholder: 'Example: Dana Miller, (740) 555-0188',
-      answer:
-        draft.contactName || draft.contactMethod
-          ? `${draft.contactName || 'Name pending'} · ${draft.contactMethod || 'Contact pending'}`
-          : '',
-      apply: (value: string) => parseContact(value),
-    },
-    {
-      id: 'notes',
-      prompt: 'Any notes or photos the team should know about?',
-      helper: 'Room count, measurements, delivery constraints, or photo notes all help the handoff.',
-      quickReplies: ['No extra notes', 'I have photos to share', 'Need help measuring'],
-      placeholder: 'Type notes for the estimate handoff',
-      optional: true,
-      multiline: true,
-      answer: draft.notes || 'No extra notes',
-      apply: (value: string) => ({ notes: value === 'No extra notes' ? '' : value }),
-    },
-  ]
-
-  const submitAnswer = (value: string) => {
-    const currentQuestion = questions[step]
-    const cleanValue = value.trim()
-
-    if (!cleanValue && !currentQuestion.optional) {
-      return
-    }
-
-    const answer = cleanValue || 'Skip'
-    const nextDraft = {
-      ...draft,
-      ...currentQuestion.apply(answer),
-    }
-
-    setDraft(nextDraft)
-    setReply('')
-
-    if (step === questions.length - 1) {
-      const lead = buildLead(nextDraft, new Date().toISOString())
-      onSubmitLead(lead)
-      setSubmittedLead(lead)
-      return
-    }
-
-    setStep((current) => current + 1)
+  const updateDraft = (updates: Partial<ContactDraft>) => {
+    setDraft((current) => ({ ...current, ...updates }))
   }
 
-  const submitComposer = (event: FormEvent<HTMLFormElement>) => {
+  const submitMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    submitAnswer(reply)
+
+    if (!draft.phone.trim() || !draft.email.trim() || !draft.message.trim()) {
+      return
+    }
+
+    onSubmitLead(buildLead(draft, new Date().toISOString()))
+    setSubmitted(true)
   }
 
   if (!open) {
     return null
   }
 
-  const currentQuestion = questions[step]
-  const isFinalStep = step === questions.length - 1
-  const answeredQuestions = questions.slice(0, step)
-
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <button
         type="button"
-        aria-label="Close estimate assistant"
+        aria-label="Close message drawer"
         className="absolute inset-0 size-full bg-slate-950/35"
         onClick={onClose}
       />
@@ -2064,23 +1827,23 @@ function AssistantDrawer({
                 <div>
                   <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800">
                     <span className="size-2 rounded-full bg-emerald-500" />
-                    Estimate bot online
+                    Message line open
                   </p>
-                  <h2 className="mt-1 text-xl font-semibold text-slate-950">Project Estimate Assistant</h2>
+                  <h2 className="mt-1 text-xl font-semibold text-slate-950">Message SupplyBird</h2>
                 </div>
                 <button
                   type="button"
-                  title="Close assistant"
+                  title="Close message drawer"
                   onClick={onClose}
                   className="inline-flex size-9 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200"
                 >
-                  <span className="sr-only">Close assistant</span>
+                  <span className="sr-only">Close message drawer</span>
                   <X className="size-5" aria-hidden="true" />
                 </button>
               </div>
             </div>
 
-            {submittedLead ? (
+            {submitted ? (
               <div className="flex-1 overflow-y-auto px-5 py-6">
                 <div className="flex items-start gap-3">
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-yellow-300 text-sm font-black text-slate-950">
@@ -2089,31 +1852,10 @@ function AssistantDrawer({
                   <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-white p-4 text-sm leading-6 text-slate-700 shadow-sm ring-1 ring-slate-900/5">
                     <div className="flex items-center gap-2 font-semibold text-emerald-700">
                       <CheckCircle2 className="size-5" aria-hidden="true" />
-                      Lead saved
+                      Message sent
                     </div>
-                    <p className="mt-2">I turned the conversation into a structured request for the sales dashboard.</p>
+                    <p className="mt-2">Okay, thank you for your message. We will reply shortly.</p>
                   </div>
-                </div>
-
-                <div className="mt-5 rounded-lg bg-white p-5 shadow-sm ring-1 ring-slate-900/5">
-                  <h3 className="text-sm font-semibold text-slate-950">AI-style lead summary</h3>
-                  <dl className="mt-4 space-y-3 text-sm">
-                    {[
-                      ['Project', submittedLead.projectType],
-                      ['Interest', submittedLead.productInterest],
-                      ['Quantity', submittedLead.estimatedQuantity || 'pending'],
-                      ['Urgency', submittedLead.urgency],
-                      ['Pickup / delivery', submittedLead.fulfillment],
-                      ['Location', submittedLead.location || 'pending'],
-                      ['Contact', `${submittedLead.contactName} · ${submittedLead.contactMethod}`],
-                      ['Next step', submittedLead.recommendedNextStep],
-                    ].map(([label, value]) => (
-                      <div key={label} className="grid grid-cols-[110px_1fr] gap-3">
-                        <dt className="text-slate-500">{label}</dt>
-                        <dd className="font-medium text-slate-800">{value}</dd>
-                      </div>
-                    ))}
-                  </dl>
                 </div>
 
                 <button
@@ -2121,7 +1863,7 @@ function AssistantDrawer({
                   onClick={onClose}
                   className="mt-6 inline-flex w-full items-center justify-center rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
                 >
-                  View in dashboard
+                  Close
                 </button>
               </div>
             ) : (
@@ -2132,142 +1874,66 @@ function AssistantDrawer({
                       SB
                     </div>
                     <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-white p-4 text-sm leading-6 text-slate-700 shadow-sm ring-1 ring-slate-900/5">
-                      <p className="font-semibold text-slate-950">Hi, I can help prep an estimate request.</p>
-                      <p className="mt-1">
-                        I’ll ask a few quick questions, then send SupplyBird a quote-ready summary for follow-up.
-                      </p>
+                      <p className="font-semibold text-slate-950">Send us a message.</p>
+                      <p className="mt-1">Add your phone number, email, and message. We will reply shortly.</p>
                     </div>
                   </div>
 
-                  {answeredQuestions.map((question) => (
-                    <div key={question.id} className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-yellow-300 text-sm font-black text-slate-950">
-                          SB
-                        </div>
-                        <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-white p-4 text-sm leading-6 text-slate-700 shadow-sm ring-1 ring-slate-900/5">
-                          {question.prompt}
-                        </div>
-                      </div>
-                      <div className="flex justify-end">
-                        <div className="max-w-[82%] rounded-2xl rounded-tr-md bg-slate-950 px-4 py-3 text-sm leading-6 text-white">
-                          {question.answer || 'Not provided'}
-                        </div>
-                      </div>
+                  {product ? (
+                    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-900/5">
+                      <p className="text-xs font-semibold uppercase tracking-normal text-slate-500">Product</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-950">{product.name}</p>
+                      <p className="mt-1 text-sm text-slate-600">{product.priceLabel}</p>
                     </div>
-                  ))}
-
-                  <div className="flex items-start gap-3">
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-yellow-300 text-sm font-black text-slate-950">
-                      SB
-                    </div>
-                    <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-white p-4 text-sm leading-6 text-slate-700 shadow-sm ring-1 ring-slate-900/5">
-                      <p className="font-semibold text-slate-950">{currentQuestion.prompt}</p>
-                      <p className="mt-1 text-slate-600">{currentQuestion.helper}</p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-slate-900/5">
-                    <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-                      <span>
-                        Question {step + 1} of {questions.length}
-                      </span>
-                      <span className="capitalize">{source}</span>
-                    </div>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full bg-yellow-300"
-                        style={{ width: `${((step + 1) / questions.length) * 100}%` }}
-                      />
-                    </div>
-
-                    {currentQuestion.suggestions ? (
-                      <div className="mt-4 grid gap-2">
-                        {currentQuestion.suggestions.map((suggestion) => (
-                          <button
-                            type="button"
-                            key={suggestion.value}
-                            onClick={() => submitAnswer(suggestion.value)}
-                            className="flex items-center justify-between gap-3 rounded-md bg-slate-50 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
-                          >
-                            <span>{suggestion.label}</span>
-                            <span className="shrink-0 font-medium text-slate-950">{suggestion.meta}</span>
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
-
-                    {currentQuestion.quickReplies ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {currentQuestion.quickReplies.map((option) => (
-                          <button
-                            type="button"
-                            key={option}
-                            onClick={() => submitAnswer(option)}
-                            className="rounded-full bg-slate-100 px-3 py-2 text-sm font-medium capitalize text-slate-700 hover:bg-slate-200"
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
-
-                    {currentQuestion.id === 'notes' ? (
-                      <div className="mt-4 rounded-md border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-center text-sm text-slate-500">
-                        Photo upload placeholder: the production version can accept room, roof, window, appliance, or
-                        material photos.
-                      </div>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
 
-                <form onSubmit={submitComposer} className="border-t border-slate-200 bg-white px-5 py-4">
-                  <div className="flex items-end gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setStep((current) => Math.max(current - 1, 0))}
-                      disabled={step === 0}
-                      className="rounded-md px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
-                    >
-                      Back
-                    </button>
-
-                    {currentQuestion.multiline ? (
-                      <textarea
-                        value={reply}
-                        onChange={(event) => setReply(event.target.value)}
-                        rows={2}
-                        placeholder={currentQuestion.placeholder}
-                        className="min-h-11 flex-1 resize-none rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
-                      />
-                    ) : (
+                <form onSubmit={submitMessage} className="space-y-4 border-t border-slate-200 bg-white px-5 py-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-700">Phone number</span>
                       <input
-                        value={reply}
-                        onChange={(event) => setReply(event.target.value)}
-                        placeholder={currentQuestion.placeholder}
-                        className="h-11 min-w-0 flex-1 rounded-md bg-slate-50 px-3 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                        required
+                        inputMode="tel"
+                        value={draft.phone}
+                        onChange={(event) => updateDraft({ phone: event.target.value })}
+                        placeholder="(740) 555-0199"
+                        className="mt-2 h-11 w-full rounded-md bg-slate-50 px-3 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
                       />
-                    )}
+                    </label>
 
-                    {currentQuestion.optional && !reply.trim() ? (
-                      <button
-                        type="button"
-                        onClick={() => submitAnswer('Skip')}
-                        className="rounded-md px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100"
-                      >
-                        Skip
-                      </button>
-                    ) : null}
-
-                    <button
-                      type="submit"
-                      className="inline-flex size-11 shrink-0 items-center justify-center rounded-md bg-slate-950 text-white hover:bg-slate-800"
-                      title={isFinalStep ? 'Send lead' : 'Send reply'}
-                    >
-                      <span className="sr-only">{isFinalStep ? 'Send lead' : 'Send reply'}</span>
-                      <Send className="size-4" aria-hidden="true" />
-                    </button>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-700">Email</span>
+                      <input
+                        required
+                        type="email"
+                        value={draft.email}
+                        onChange={(event) => updateDraft({ email: event.target.value })}
+                        placeholder="you@example.com"
+                        className="mt-2 h-11 w-full rounded-md bg-slate-50 px-3 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                      />
+                    </label>
                   </div>
+
+                  <label className="block">
+                    <span className="text-sm font-medium text-slate-700">Message</span>
+                    <textarea
+                      required
+                      value={draft.message}
+                      onChange={(event) => updateDraft({ message: event.target.value })}
+                      rows={4}
+                      placeholder="How can we help?"
+                      className="mt-2 min-h-28 w-full resize-none rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                    />
+                  </label>
+
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+                  >
+                    <Send className="size-4" aria-hidden="true" />
+                    Send message
+                  </button>
                 </form>
               </>
             )}
@@ -2419,7 +2085,7 @@ function App() {
                     className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm ring-1 ring-slate-900/10 hover:bg-slate-50"
                   >
                     <MessageSquareText className="size-4" aria-hidden="true" />
-                    Qualify a custom request
+                    Send a custom message
                   </button>
                 </div>
 
@@ -2432,14 +2098,14 @@ function App() {
                 ) : (
                   <div className="rounded-lg bg-white px-6 py-12 text-center shadow-sm ring-1 ring-slate-900/5">
                     <p className="text-base font-semibold text-slate-950">No matching inventory</p>
-                    <p className="mt-2 text-sm text-slate-500">Adjust the filters or start a custom estimate request.</p>
+                    <p className="mt-2 text-sm text-slate-500">Adjust the filters or send a message.</p>
                     <button
                       type="button"
                       onClick={openAssistant}
                       className="mt-5 inline-flex items-center gap-2 rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
                     >
                       <MessageSquareText className="size-4" aria-hidden="true" />
-                      Start intake
+                      Send message
                     </button>
                   </div>
                 )}
@@ -2464,7 +2130,6 @@ function App() {
         open={assistantOpen}
         source={assistantSource}
         product={selectedProduct}
-        products={products}
         onClose={() => setAssistantOpen(false)}
         onSubmitLead={addLead}
       />
