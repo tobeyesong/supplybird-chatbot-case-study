@@ -58,7 +58,7 @@ The owner or seller needs more than lead viewing. They need a lightweight operat
 
 - sign in with Google
 - review leads and change status
-- edit product names, categories, pricing labels, stock state, specs, and notes
+- edit product names, categories, pricing labels, stock state, stock quantity, box coverage, specs, and notes
 - update listing images by hosted URL or image upload/storage
 - see which products are low stock
 - reset or sync records during pilot testing
@@ -92,9 +92,15 @@ Specs
 Notes
 Image Attachment / Image URL
 Image Alt Text
+Sq.ft. Per Box / Case
+Stock Quantity
+Stock Unit Label
 Updated By
 Updated At
 ```
+
+The consumer calculator should read `Sq.ft. Per Box / Case` directly. For example, if an owner enters `20.1`, a shopper
+who needs `875` square feet can be shown the exact number of boxes after rounding up and adding a waste factor.
 
 Suggested `Leads` fields:
 

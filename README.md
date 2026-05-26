@@ -24,6 +24,8 @@ The point is practical lead qualification, not AI novelty.
 - Google-gated seller/admin dashboard with demo owner mode
 - Lead status changes for `new`, `contacted`, `quoted`, `won`, and `lost`
 - Editable product listings with image URL updates and local image previews
+- Admin inventory fields for `sq.ft. per box/case`, stock count, and stock unit label
+- Consumer-facing product detail calculator that converts entered square footage into full boxes with 10% waste
 - Case-study section with problem, solution, workflow, and metrics placeholders
 - Generated bitmap assets in `public/supplybird-assets`
 - Production path in `docs/supplybird-infrastructure-blueprint.md`
@@ -76,8 +78,10 @@ http://localhost:5173/
 ## Verify The Main Flow
 
 1. Browse the inventory grid.
-2. Click `Ask / Get estimate` on a product card.
-3. Complete the Project Estimate Assistant steps.
-4. Save the lead.
-5. Confirm the new lead appears in the dashboard.
-6. Change the lead status and refresh to confirm LocalStorage persistence.
+2. Click `Details / calculator` on a flooring product and enter total square footage.
+3. Confirm the calculator uses the product's `sq.ft. per box/case` field to recommend boxes.
+4. Click `Ask / Get estimate` on a product card.
+5. Complete the Project Estimate Assistant steps.
+6. Save the lead.
+7. Confirm the new lead appears in the dashboard.
+8. In demo owner mode, edit a listing and confirm coverage/stock fields are available.

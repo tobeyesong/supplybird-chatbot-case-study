@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Calculator,
   CheckCircle2,
   Clock,
   Database,
@@ -14,12 +15,15 @@ import {
   MessageSquareText,
   PackagePlus,
   Phone,
+  Plus,
   PlugZap,
+  Ruler,
   Search,
   Send,
   ShieldCheck,
   SlidersHorizontal,
   Table2,
+  Trash2,
   X,
 } from 'lucide-react'
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth'
@@ -42,6 +46,7 @@ import { auth, googleProvider, isFirebaseConfigured } from './firebase'
 type PriceFilter = 'all' | 'budget' | 'mid' | 'large'
 type AssistantSource = 'chatbot' | 'product CTA'
 type OwnerTab = 'leads' | 'listings' | 'stack'
+type CalculatorMode = 'rooms' | 'total'
 type OwnerSession = {
   displayName: string
   email: string
@@ -109,6 +114,22 @@ function classNames(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
 
+function productCoverage(product: Product) {
+  return product.coveragePerBoxSqft ?? null
+}
+
+function stockLabel(product: Product) {
+  if (product.stockQuantity === null || product.stockQuantity === undefined) {
+    return product.availability
+  }
+
+  return `${product.stockQuantity} ${product.stockUnit || 'units'} in stock`
+}
+
+function roundSqft(value: number) {
+  return Number.isFinite(value) ? Math.round(value * 10) / 10 : 0
+}
+
 function canManageStore(email?: string | null) {
   return Boolean(email && allowedOwnerEmails.includes(email.trim().toLowerCase()))
 }
@@ -133,6 +154,9 @@ function newProductDraft(): Product {
     price: 0,
     priceLabel: 'Quote pending',
     availability: 'In stock',
+    coveragePerBoxSqft: 20.1,
+    stockQuantity: 0,
+    stockUnit: 'boxes',
     condition: 'New or inspected',
     specs: 'Add dimensions, coverage, quantity, or relevant specs.',
     notes: 'Add the best use case, constraints, or follow-up notes.',
@@ -561,63 +585,363 @@ function CategoryStrip({
   )
 }
 
-function ProductGrid({ products, onEstimate }: { products: Product[]; onEstimate: (product: Product) => void }) {
+function ProductGrid({
+  products,
+  onEstimate,
+  onViewProduct,
+}: {
+  products: Product[]
+  onEstimate: (product: Product) => void
+  onViewProduct: (product: Product) => void
+}) {
   return (
     <div className="grid grid-cols-1 gap-x-5 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
-      {products.map((product) => (
-        <article key={product.id} className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-900/5">
-          <div className="aspect-[4/3] overflow-hidden bg-slate-100">
-            <img
-              src={product.image}
-              alt={product.imageAlt}
-              className="size-full object-cover transition duration-300 group-hover:scale-105"
-            />
-          </div>
-          <div className="p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-normal text-slate-500">{product.category}</p>
-                <h3 className="mt-1 text-base font-semibold leading-6 text-slate-950">{product.name}</h3>
+      {products.map((product) => {
+        const coverage = productCoverage(product)
+
+        return (
+          <article
+            key={product.id}
+            className="group overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-900/5"
+          >
+            <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+              <img
+                src={product.image}
+                alt={product.imageAlt}
+                className="size-full object-cover transition duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-normal text-slate-500">{product.category}</p>
+                  <h3 className="mt-1 text-base font-semibold leading-6 text-slate-950">{product.name}</h3>
+                </div>
+                <span
+                  className={classNames(
+                    'shrink-0 rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset',
+                    product.availability === 'In stock' && 'bg-emerald-50 text-emerald-700 ring-emerald-600/15',
+                    product.availability === 'Low stock' && 'bg-amber-50 text-amber-700 ring-amber-600/20',
+                    product.availability === 'Special order' && 'bg-sky-50 text-sky-700 ring-sky-600/15',
+                  )}
+                >
+                  {product.availability}
+                </span>
               </div>
-              <span
-                className={classNames(
-                  'shrink-0 rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset',
-                  product.availability === 'In stock' && 'bg-emerald-50 text-emerald-700 ring-emerald-600/15',
-                  product.availability === 'Low stock' && 'bg-amber-50 text-amber-700 ring-amber-600/20',
-                  product.availability === 'Special order' && 'bg-sky-50 text-sky-700 ring-sky-600/15',
-                )}
-              >
-                {product.availability}
-              </span>
+
+              <p className="mt-3 text-lg font-semibold text-slate-950">{product.priceLabel}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{product.specs}</p>
+
+              <dl className="mt-4 grid gap-2 text-sm">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-500">Condition</dt>
+                  <dd className="text-right font-medium text-slate-800">{product.condition}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-500">Use case</dt>
+                  <dd className="text-right font-medium text-slate-800">{product.projectType}</dd>
+                </div>
+                {coverage ? (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-slate-500">Coverage</dt>
+                    <dd className="text-right font-medium text-slate-800">{coverage} sq.ft. / box</dd>
+                  </div>
+                ) : null}
+                <div className="flex justify-between gap-4">
+                  <dt className="text-slate-500">Inventory</dt>
+                  <dd className="text-right font-medium text-slate-800">{stockLabel(product)}</dd>
+                </div>
+              </dl>
+
+              <p className="mt-4 text-sm leading-6 text-slate-600">{product.notes}</p>
+
+              <div className="mt-5 grid gap-2">
+                {coverage ? (
+                  <button
+                    type="button"
+                    onClick={() => onViewProduct(product)}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-yellow-300 px-3 py-2.5 text-sm font-semibold text-slate-950 hover:bg-yellow-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400"
+                  >
+                    <Calculator className="size-4" aria-hidden="true" />
+                    Details / calculator
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => onEstimate(product)}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
+                >
+                  <MessageSquareText className="size-4" aria-hidden="true" />
+                  Ask / Get estimate
+                </button>
+              </div>
+            </div>
+          </article>
+        )
+      })}
+    </div>
+  )
+}
+
+function ProductCalculator({ product }: { product: Product }) {
+  const coverage = productCoverage(product) ?? 0
+  const [mode, setMode] = useState<CalculatorMode>('total')
+  const [totalSqft, setTotalSqft] = useState('')
+  const [roomName, setRoomName] = useState('Room')
+  const [roomLength, setRoomLength] = useState('')
+  const [roomWidth, setRoomWidth] = useState('')
+  const [rooms, setRooms] = useState<Array<{ id: string; name: string; sqft: number }>>([])
+
+  const toNumber = (value: string) => Number.parseFloat(value) || 0
+  const activeRoomSqft = roundSqft(toNumber(roomLength) * toNumber(roomWidth))
+  const savedRoomSqft = rooms.reduce((total, room) => total + room.sqft, 0)
+  const enteredSqft = mode === 'total' ? toNumber(totalSqft) : savedRoomSqft
+  const recommendedSqft = roundSqft(enteredSqft * 1.1)
+  const boxesNeeded = coverage && recommendedSqft ? Math.ceil(recommendedSqft / coverage) : 0
+  const estimatedCoverage = roundSqft(boxesNeeded * coverage)
+  const estimatedMaterialCost = roundSqft(enteredSqft * product.price)
+  const stockQuantity = product.stockQuantity ?? 0
+  const hasEnoughStock = stockQuantity ? boxesNeeded <= stockQuantity : true
+
+  const addRoom = () => {
+    if (!activeRoomSqft) {
+      return
+    }
+
+    setRooms((current) => [
+      ...current,
+      {
+        id: `room-${Date.now()}`,
+        name: roomName.trim() || `Room ${current.length + 1}`,
+        sqft: activeRoomSqft,
+      },
+    ])
+    setRoomName(`Room ${rooms.length + 2}`)
+    setRoomLength('')
+    setRoomWidth('')
+  }
+
+  const removeRoom = (roomId: string) => {
+    setRooms((current) => current.filter((room) => room.id !== roomId))
+  }
+
+  return (
+    <div className="rounded-lg bg-slate-950 p-5 text-white shadow-sm">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="inline-flex items-center gap-2 text-base font-semibold">
+          <Calculator className="size-5 text-yellow-300" aria-hidden="true" />
+          Calculator
+        </h3>
+        <p className="text-sm text-slate-300">{coverage ? `${coverage} sqft / box` : 'Coverage needed'}</p>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 rounded-md bg-slate-900 p-1 ring-1 ring-white/10">
+        {[
+          ['rooms', 'By Room'],
+          ['total', 'Enter Total'],
+        ].map(([value, label]) => (
+          <button
+            type="button"
+            key={value}
+            onClick={() => setMode(value as CalculatorMode)}
+            className={classNames(
+              'rounded px-3 py-2 text-sm font-semibold',
+              mode === value ? 'bg-white text-slate-950' : 'text-slate-300 hover:text-white',
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'total' ? (
+        <label className="mt-5 block">
+          <span className="text-sm font-medium text-slate-300">Total square feet</span>
+          <div className="mt-2 flex items-center gap-3">
+            <input
+              inputMode="decimal"
+              value={totalSqft}
+              onChange={(event) => setTotalSqft(event.target.value)}
+              placeholder="Example: 875"
+              className="h-12 min-w-0 flex-1 rounded-md bg-slate-900 px-3 text-sm text-white outline-1 -outline-offset-1 outline-white/15 placeholder:text-slate-500 focus:outline-2 focus:-outline-offset-2 focus:outline-yellow-300"
+            />
+            <span className="text-sm text-slate-300">sqft</span>
+          </div>
+        </label>
+      ) : (
+        <div className="mt-5 space-y-4">
+          <div className="grid gap-3 sm:grid-cols-[1fr_0.75fr_0.75fr_auto]">
+            <label className="block">
+              <span className="text-sm font-medium text-slate-300">Room</span>
+              <input
+                value={roomName}
+                onChange={(event) => setRoomName(event.target.value)}
+                className="mt-2 h-11 w-full rounded-md bg-slate-900 px-3 text-sm text-white outline-1 -outline-offset-1 outline-white/15 focus:outline-2 focus:-outline-offset-2 focus:outline-yellow-300"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-slate-300">Length</span>
+              <input
+                inputMode="decimal"
+                value={roomLength}
+                onChange={(event) => setRoomLength(event.target.value)}
+                className="mt-2 h-11 w-full rounded-md bg-slate-900 px-3 text-sm text-white outline-1 -outline-offset-1 outline-white/15 focus:outline-2 focus:-outline-offset-2 focus:outline-yellow-300"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium text-slate-300">Width</span>
+              <input
+                inputMode="decimal"
+                value={roomWidth}
+                onChange={(event) => setRoomWidth(event.target.value)}
+                className="mt-2 h-11 w-full rounded-md bg-slate-900 px-3 text-sm text-white outline-1 -outline-offset-1 outline-white/15 focus:outline-2 focus:-outline-offset-2 focus:outline-yellow-300"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={addRoom}
+              disabled={!activeRoomSqft}
+              className="mt-7 inline-flex h-11 items-center justify-center gap-2 rounded-md bg-yellow-300 px-3 text-sm font-semibold text-slate-950 hover:bg-yellow-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus className="size-4" aria-hidden="true" />
+              Add
+            </button>
+          </div>
+
+          {activeRoomSqft ? <p className="text-sm text-slate-300">Current room: {activeRoomSqft} sqft</p> : null}
+
+          {rooms.length ? (
+            <div className="divide-y divide-white/10 rounded-md bg-slate-900">
+              {rooms.map((room) => (
+                <div key={room.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                  <span className="min-w-0 truncate text-slate-200">
+                    {room.name} · {room.sqft} sqft
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeRoom(room.id)}
+                    title={`Remove ${room.name}`}
+                    className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white"
+                  >
+                    <span className="sr-only">Remove {room.name}</span>
+                    <Trash2 className="size-4" aria-hidden="true" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-md bg-white px-4 py-3 text-slate-950">
+          <p className="text-xs font-medium text-slate-500">Entered area</p>
+          <p className="mt-1 text-xl font-semibold">{roundSqft(enteredSqft)} sqft</p>
+        </div>
+        <div className="rounded-md bg-white px-4 py-3 text-slate-950">
+          <p className="text-xs font-medium text-slate-500">With 10% waste</p>
+          <p className="mt-1 text-xl font-semibold">{recommendedSqft} sqft</p>
+        </div>
+        <div className="rounded-md bg-yellow-300 px-4 py-3 text-slate-950">
+          <p className="text-xs font-semibold text-slate-700">Boxes needed</p>
+          <p className="mt-1 text-xl font-black">{boxesNeeded || '-'}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
+        <p>Covers about {estimatedCoverage || 0} sqft after rounding up to full boxes.</p>
+        <p>{stockQuantity ? (hasEnoughStock ? `${stockLabel(product)} can cover this.` : 'This exceeds current stock.') : 'Stock quantity pending.'}</p>
+        {enteredSqft ? <p className="sm:col-span-2">Material estimate before tax: ${estimatedMaterialCost.toLocaleString()}</p> : null}
+      </div>
+    </div>
+  )
+}
+
+function ProductDetailDrawer({
+  product,
+  onClose,
+  onEstimate,
+}: {
+  product: Product
+  onClose: () => void
+  onEstimate: (product: Product) => void
+}) {
+  const coverage = productCoverage(product)
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <button
+        type="button"
+        aria-label="Close product details"
+        className="absolute inset-0 bg-slate-950/60"
+        onClick={onClose}
+      />
+      <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-6 sm:pl-16">
+        <div className="pointer-events-auto flex w-screen max-w-xl flex-col bg-white shadow-2xl">
+          <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-slate-500">{product.category}</p>
+              <h2 className="mt-1 text-xl font-semibold leading-7 text-slate-950">{product.name}</h2>
+            </div>
+            <button
+              type="button"
+              title="Close product details"
+              onClick={onClose}
+              className="inline-flex size-9 items-center justify-center rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200"
+            >
+              <span className="sr-only">Close product details</span>
+              <X className="size-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-6">
+            <img src={product.image} alt={product.imageAlt} className="aspect-[4/3] w-full rounded-lg bg-slate-100 object-cover" />
+
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-slate-950 px-3 py-1.5 text-sm font-semibold text-white">
+                  {product.priceLabel}
+                </span>
+                {coverage ? (
+                  <span className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-800">
+                    {coverage} sq.ft. / box
+                  </span>
+                ) : null}
+                <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700">
+                  {stockLabel(product)}
+                </span>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-600">{product.specs}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">{product.notes}</p>
             </div>
 
-            <p className="mt-3 text-lg font-semibold text-slate-950">{product.priceLabel}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{product.specs}</p>
-
-            <dl className="mt-4 grid gap-2 text-sm">
-              <div className="flex justify-between gap-4">
-                <dt className="text-slate-500">Condition</dt>
-                <dd className="text-right font-medium text-slate-800">{product.condition}</dd>
+            {coverage ? (
+              <ProductCalculator product={product} />
+            ) : (
+              <div className="rounded-lg bg-slate-50 p-5">
+                <h3 className="inline-flex items-center gap-2 text-base font-semibold text-slate-950">
+                  <Ruler className="size-5 text-slate-500" aria-hidden="true" />
+                  Calculator unavailable
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Add square feet per box or bundle in the owner dashboard to enable the consumer calculator.
+                </p>
               </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-slate-500">Use case</dt>
-                <dd className="text-right font-medium text-slate-800">{product.projectType}</dd>
-              </div>
-            </dl>
+            )}
+          </div>
 
-            <p className="mt-4 text-sm leading-6 text-slate-600">{product.notes}</p>
-
+          <div className="flex shrink-0 gap-3 border-t border-slate-200 px-5 py-4">
             <button
               type="button"
               onClick={() => onEstimate(product)}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-950"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
             >
               <MessageSquareText className="size-4" aria-hidden="true" />
               Ask / Get estimate
             </button>
           </div>
-        </article>
-      ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -910,7 +1234,7 @@ function OwnerDashboard({
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 ['Leads', 'Review estimate requests, assign statuses, and identify hot opportunities.'],
-                ['Listings', 'Update product copy, pricing, stock state, specs, and images without editing code.'],
+                ['Listings', 'Update product copy, pricing, stock count, box coverage, specs, and images without editing code.'],
                 ['Images', 'Paste hosted image URLs or preview a local image file during the prototype.'],
                 ['Pilot stack', 'Move the same records into Airtable first, then Supabase when auth and APIs matter.'],
               ].map(([title, body]) => (
@@ -983,7 +1307,7 @@ function OwnerDashboard({
                   <div>
                     <h3 className="text-base font-semibold text-slate-950">Editable listings</h3>
                     <p className="mt-1 text-sm leading-6 text-slate-600">
-                      Updates persist locally and immediately affect the storefront plus assistant suggestions.
+                      Updates persist locally and power the storefront, assistant suggestions, and consumer calculators.
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -1041,16 +1365,21 @@ function OwnerDashboard({
                                   <dt className="sr-only">Specs</dt>
                                   <dd className="mt-1 truncate text-slate-600">{product.specs}</dd>
                                   <dt className="sr-only sm:hidden">Availability</dt>
-                                  <dd className="mt-1 truncate text-slate-500 sm:hidden">{product.availability}</dd>
+                                  <dd className="mt-1 truncate text-slate-500 sm:hidden">{stockLabel(product)}</dd>
                                 </dl>
                               </div>
                             </div>
                           </td>
                           <td className="hidden max-w-md px-3 py-4 text-sm text-slate-500 lg:table-cell">
                             <p className="line-clamp-2">{product.specs}</p>
+                            {productCoverage(product) ? (
+                              <p className="mt-1 font-medium text-slate-700">
+                                {productCoverage(product)} sq.ft. / box
+                              </p>
+                            ) : null}
                           </td>
                           <td className="hidden px-3 py-4 text-sm text-slate-500 sm:table-cell">
-                            {product.availability}
+                            {stockLabel(product)}
                           </td>
                           <td className="px-3 py-4 text-sm font-medium text-slate-950">{product.priceLabel}</td>
                           <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-5">
@@ -1278,6 +1607,50 @@ function ProductEditorDrawer({
                   value={draft.condition}
                   onChange={(event) => updateDraft({ condition: event.target.value })}
                   className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-slate-700">Sq.ft. per box / case</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={draft.coveragePerBoxSqft ?? ''}
+                  onChange={(event) =>
+                    updateDraft({
+                      coveragePerBoxSqft: event.target.value ? Number(event.target.value) : null,
+                    })
+                  }
+                  placeholder="20.1"
+                  className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-sm font-medium text-slate-700">Units in stock</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={draft.stockQuantity ?? ''}
+                  onChange={(event) =>
+                    updateDraft({
+                      stockQuantity: event.target.value ? Number(event.target.value) : null,
+                    })
+                  }
+                  placeholder="28"
+                  className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
+                />
+              </label>
+
+              <label className="block sm:col-span-2">
+                <span className="text-sm font-medium text-slate-700">Stock unit label</span>
+                <input
+                  value={draft.stockUnit ?? ''}
+                  onChange={(event) => updateDraft({ stockUnit: event.target.value })}
+                  placeholder="boxes, cases, bundles, units"
+                  className="mt-2 block w-full rounded-md bg-white px-3 py-2 text-sm text-slate-950 outline-1 -outline-offset-1 outline-slate-300 placeholder:text-slate-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-950"
                 />
               </label>
 
@@ -1917,6 +2290,7 @@ function App() {
   const [assistantSource, setAssistantSource] = useState<AssistantSource>('chatbot')
   const [assistantSession, setAssistantSession] = useState(0)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null)
 
   const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -1952,6 +2326,11 @@ function App() {
     setAssistantSource('product CTA')
     setAssistantSession((current) => current + 1)
     setAssistantOpen(true)
+  }
+
+  const openAssistantFromDetail = (product: Product) => {
+    setDetailProduct(null)
+    openAssistantForProduct(product)
   }
 
   const addLead = (lead: Lead) => {
@@ -2045,7 +2424,11 @@ function App() {
                 </div>
 
                 {filteredProducts.length ? (
-                  <ProductGrid products={filteredProducts} onEstimate={openAssistantForProduct} />
+                  <ProductGrid
+                    products={filteredProducts}
+                    onEstimate={openAssistantForProduct}
+                    onViewProduct={setDetailProduct}
+                  />
                 ) : (
                   <div className="rounded-lg bg-white px-6 py-12 text-center shadow-sm ring-1 ring-slate-900/5">
                     <p className="text-base font-semibold text-slate-950">No matching inventory</p>
@@ -2085,6 +2468,14 @@ function App() {
         onClose={() => setAssistantOpen(false)}
         onSubmitLead={addLead}
       />
+      {detailProduct ? (
+        <ProductDetailDrawer
+          key={detailProduct.id}
+          product={detailProduct}
+          onClose={() => setDetailProduct(null)}
+          onEstimate={openAssistantFromDetail}
+        />
+      ) : null}
     </div>
   )
 }
