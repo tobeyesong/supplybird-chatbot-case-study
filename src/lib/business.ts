@@ -30,6 +30,7 @@ export function phoneHref() {
   return `tel:${business.phoneNumber}`
 }
 
-export function textHref() {
-  return `sms:${business.textNumber}`
+export function textHref(body?: string) {
+  const encodedBody = body ? `?body=${encodeURIComponent(body)}` : ''
+  return `sms:${business.textNumber}${encodedBody}`
 }
