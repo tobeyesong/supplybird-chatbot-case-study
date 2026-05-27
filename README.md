@@ -29,11 +29,16 @@ Open `http://localhost:3000`.
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 NEXT_PUBLIC_PHONE_NUMBER=+19499430957
+NEXT_PUBLIC_TEXT_NUMBER=+19499430957
 NEXT_PUBLIC_CHATBOT_EMBED_SRC=
 NEXT_PUBLIC_SITE_URL=
 OWNER_INVITE_CODE=
 OWNER_ACCESS_SECRET=
 ADMIN_ALLOWED_EMAILS=
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_FROM_NUMBER=+19499430957
+TWILIO_OWNER_TO_NUMBER=
 ```
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported if the project still uses legacy anon key naming.
@@ -51,6 +56,16 @@ Use `ADMIN_ALLOWED_EMAILS` for explicit creator/admin access, for example `you@e
 ## Lead Notifications
 
 The chatbot submits to the Netlify Form named `modhaus-chat`. Add a Netlify form submission email notification for that form and send it to `modhausllc@gmail.com`.
+
+When Twilio environment variables are present, each valid chatbot lead also sends an SMS alert from the Twilio number to the owner number. Keep `TWILIO_AUTH_TOKEN` out of Git and rotate it if it is ever pasted into chat.
+
+Set the Twilio number inbound messaging webhook to:
+
+```text
+https://modhauschat.netlify.app/api/twilio/sms
+```
+
+Use `POST`. Inbound texts are captured as Netlify form leads and receive the same short thank-you reply.
 
 ## Routes
 

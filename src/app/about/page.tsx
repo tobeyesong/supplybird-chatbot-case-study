@@ -61,7 +61,7 @@ export default function AboutPage() {
               <ChatOpenButton label="Ask about inventory" />
               <a href={textHref()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-bold text-background hover:bg-foreground/88">
                 <MessageSquare className="size-4" aria-hidden="true" />
-                Text {business.phoneDisplay}
+                Text {business.textDisplay}
               </a>
             </div>
           </div>

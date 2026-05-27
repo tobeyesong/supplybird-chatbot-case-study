@@ -1,5 +1,7 @@
 const defaultPhoneNumber = '+19499430957'
+const defaultTextNumber = '+19499430957'
 const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER || defaultPhoneNumber
+const textNumber = process.env.NEXT_PUBLIC_TEXT_NUMBER || defaultTextNumber
 
 function formatPhoneDisplay(phone: string) {
   const digits = phone.replace(/\D/g, '')
@@ -18,6 +20,8 @@ export const business = {
   hours: 'Open daily, 10:00 AM - 6:00 PM',
   phoneDisplay: formatPhoneDisplay(phoneNumber),
   phoneNumber,
+  textDisplay: formatPhoneDisplay(textNumber),
+  textNumber,
   instagramUrl: '#',
   facebookUrl: '#',
 }
@@ -27,5 +31,5 @@ export function phoneHref() {
 }
 
 export function textHref() {
-  return `sms:${business.phoneNumber}`
+  return `sms:${business.textNumber}`
 }
