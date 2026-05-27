@@ -4,6 +4,7 @@ import { deleteProduct, updateCategoryPricing } from '@/app/admin/products/actio
 import { AdminLogoutButton } from '@/components/admin-logout-button'
 import { AdminToasts, type AdminToastMessage } from '@/components/admin-toasts'
 import { DeleteProductForm } from '@/components/delete-product-form'
+import { AdminProductsEmptyState } from '@/components/empty-state'
 import { ProductImage } from '@/components/product-image'
 import { getCategorySettings, normalizeProduct } from '@/lib/catalog'
 import { categories, fallbackProducts } from '@/lib/catalog-data'
@@ -199,9 +200,8 @@ export default async function AdminPage({ searchParams }: PageProps) {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center">
-              <h2 className="text-2xl font-black">No products yet.</h2>
-              <p className="mt-2 text-muted">Add the first inventory item to populate the catalog.</p>
+            <div className="px-5 pb-5">
+              <AdminProductsEmptyState />
             </div>
           )}
         </div>

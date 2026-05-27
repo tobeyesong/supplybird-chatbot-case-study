@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { CategoryEmptyState } from '@/components/empty-state'
 import { ProductCard } from '@/components/product-card'
 import { getCategoriesWithSettings, getCategoryWithSettings, getProducts, isProductCategory } from '@/lib/catalog'
 
@@ -68,10 +69,7 @@ export default async function CategoryPage({ params }: PageProps) {
             ))}
           </div>
         ) : (
-          <div className="surface-card mt-10 p-8 text-center">
-            <h2 className="text-2xl font-black">No products listed yet.</h2>
-            <p className="mt-2 text-muted">Check back after the owner adds inventory.</p>
-          </div>
+          <CategoryEmptyState category={category.slug} />
         )}
       </div>
     </section>
