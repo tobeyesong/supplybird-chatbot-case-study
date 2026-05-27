@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Edit, Plus } from 'lucide-react'
-import { logout } from '@/app/admin/actions'
 import { deleteProduct, updateCategoryPricing } from '@/app/admin/products/actions'
+import { AdminLogoutButton } from '@/components/admin-logout-button'
 import { AdminToasts, type AdminToastMessage } from '@/components/admin-toasts'
 import { DeleteProductForm } from '@/components/delete-product-form'
 import { getCategorySettings, normalizeProduct } from '@/lib/catalog'
@@ -96,11 +96,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <Plus className="size-4" aria-hidden="true" />
               Add product
             </Link>
-            <form action={logout}>
-              <button className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-foreground px-5 py-3 text-sm font-bold text-background hover:bg-foreground/88" type="submit">
-                Log out
-              </button>
-            </form>
+            <AdminLogoutButton />
           </div>
         </div>
 

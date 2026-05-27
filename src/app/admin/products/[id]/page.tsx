@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { updateProduct } from '@/app/admin/products/actions'
+import { AdminLogoutButton } from '@/components/admin-logout-button'
 import { ProductForm } from '@/components/product-form'
 import { normalizeProduct } from '@/lib/catalog'
 import { fallbackProducts } from '@/lib/catalog-data'
@@ -28,10 +29,13 @@ export default async function EditProductPage({ params, searchParams }: PageProp
     return (
       <section className="section-y">
         <div className="page-container max-w-4xl">
-          <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground">
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Back to inventory
-          </Link>
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+            <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground">
+              <ArrowLeft className="size-4" aria-hidden="true" />
+              Back to inventory
+            </Link>
+            <AdminLogoutButton />
+          </div>
           <div className="mt-8 surface-card p-6 md:p-8">
             <h1 className="text-3xl font-black tracking-normal">Edit product</h1>
             <p className="mt-2 text-muted">Update listing details, stock status, calculator coverage, and photos.</p>
@@ -59,10 +63,13 @@ export default async function EditProductPage({ params, searchParams }: PageProp
   return (
     <section className="section-y">
       <div className="page-container max-w-4xl">
-        <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground">
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          Back to inventory
-        </Link>
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground">
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Back to inventory
+          </Link>
+          <AdminLogoutButton />
+        </div>
         <div className="mt-8 surface-card p-6 md:p-8">
           <h1 className="text-3xl font-black tracking-normal">Edit product</h1>
           <p className="mt-2 text-muted">Update listing details, stock status, calculator coverage, and photos.</p>
