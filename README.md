@@ -1,86 +1,57 @@
-# SupplyBird Chatbot Case Study Prototype
+# ModHaus Catalog
 
-React + TypeScript + Tailwind prototype for a SupplyBird buyer-response workflow.
+Next.js App Router + Tailwind catalog for an Orange County, California building supply reseller.
 
-## What It Validates
+## Stack
 
-This prototype tests whether a simple chatbot-style message drawer can improve speed-to-lead for a local building-supplies store. The assistant is tied to catalog browsing and captures only the information needed to reply:
+- Next.js + Tailwind CSS
+- Supabase Postgres, Auth, and Storage
+- Vercel-ready deployment
+- Sitewide chatbot widget with call and chat contact CTAs
 
-- phone number
-- email
-- customer message
-- optional product context from the catalog
-
-The calculator handles product math for the consumer. The chatbot stays intentionally simple.
-
-## Prototype Surface
-
-- Storefront/catalog home using SupplyBird-style categories and live-site business details
-- Seeded inventory for flooring, decking, roofing, windows, appliances, and other supplies
-- Search and filters for category, availability, price range, and project type
-- Simple message drawer with phone, email, message, and thank-you confirmation
-- LocalStorage lead persistence
-- Google-gated seller/admin dashboard with demo owner mode
-- Lead status changes for `new`, `contacted`, `quoted`, `won`, and `lost`
-- Editable product listings with image URL updates and local image previews
-- Admin inventory fields for `sq.ft. per box/case`, stock count, and stock unit label
-- Consumer-facing product detail calculator that converts entered square footage into full boxes with 10% waste
-- Case-study section with problem, solution, workflow, and metrics placeholders
-- Generated bitmap assets in `public/supplybird-assets`
-- Production path in `docs/supplybird-infrastructure-blueprint.md`
-
-## Design Notes
-
-The UI adapts local Tailwind Plus ecommerce/application patterns for product cards, filters, drawers, forms, and lead lists. It also applies Refactoring UI principles from the Obsidian vault: start with the feature, establish hierarchy through weight and contrast, use constrained spacing/type choices, keep borders purposeful, and avoid oversized marketing composition.
-
-## Production Path
-
-The current SupplyBird site appears to use a Chatway-style live chat widget. That can remain the visible chat channel, but the stronger system is:
-
-```text
-chat/contact widget -> structured estimate intake -> Airtable/Supabase/CRM -> notification + follow-up -> dashboard
-```
-
-See [docs/supplybird-infrastructure-blueprint.md](docs/supplybird-infrastructure-blueprint.md) for the Airtable-first and Supabase-first paths.
-
-## Owner Login
-
-The dashboard follows the Firebase Google Sign-In pattern from the Video X project. To use real Google auth, create a
-Firebase web app and add:
-
-```bash
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-```
-
-Without those env vars, use `Use demo owner mode` in the dashboard. The current owner allowlist is defined in
-`src/App.tsx` as `allowedOwnerEmails`.
-
-## Run Locally
+## Local Setup
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-Then open the local Vite URL, usually:
+Open `http://localhost:3000`.
 
-```text
-http://localhost:5173/
+## Supabase Setup
+
+1. Create a Supabase project.
+2. Run `supabase/schema.sql` in the SQL editor.
+3. Create one owner user in Supabase Auth.
+4. Add these values to `.env.local` and Vercel:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_PHONE_NUMBER=+17145550138
+NEXT_PUBLIC_CHATBOT_EMBED_SRC=
 ```
 
-## Verify The Main Flow
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported if the project still uses legacy anon key naming.
 
-1. Browse the inventory grid.
-2. Click `Details / calculator` on a flooring product and enter total square footage.
-3. Confirm the calculator uses the product's `sq.ft. per box/case` field to recommend boxes.
-4. Click `Send message` on a product card.
-5. Enter phone number, email, and message.
-6. Confirm the final message says `Okay, thank you for your message. We will reply shortly.`
-7. Confirm the new lead appears in the dashboard.
-8. In demo owner mode, edit a listing and confirm coverage/stock fields are available.
+## Routes
+
+- `/` public home
+- `/shop/[category]` public category pages
+- `/shop/[category]/[slug]` public product detail pages
+- `/about` public business page
+- `/admin/login` owner login
+- `/admin` owner inventory page
+- `/admin/products/new` add product
+- `/admin/products/[id]` edit product
+
+## Calculator
+
+Product detail pages use:
+
+```ts
+boxes = Math.ceil((squareFeet * 1.10) / coverage_per_box)
+```
+
+The admin product form exposes `coverage_per_box`, so each listing can drive its own calculator.
