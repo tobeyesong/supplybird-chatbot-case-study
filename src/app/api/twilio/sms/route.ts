@@ -27,7 +27,7 @@ function getPublicRequestUrl(request: Request) {
 }
 
 function isValidTwilioSignature(request: Request, params: URLSearchParams) {
-  const authToken = process.env.TWILIO_AUTH_TOKEN
+  const authToken = process.env.TWILIO_WEBHOOK_AUTH_TOKEN || process.env.TWILIO_AUTH_TOKEN
   const signature = request.headers.get('x-twilio-signature')
 
   if (!authToken || !signature) return false
@@ -41,6 +41,26 @@ function isValidTwilioSignature(request: Request, params: URLSearchParams) {
   const actualBuffer = Buffer.from(signature)
 
   return expectedBuffer.length === actualBuffer.length && crypto.timingSafeEqual(expectedBuffer, actualBuffer)
+}
+
+function hasValidWebhookSecret(request: Request) {
+  const webhookSecret = process.env.TWILIO_WEBHOOK_SECRET
+  if (!webhookSecret) return false
+
+  const requestSecret = new URL(request.url).searchParams.get('secret')
+  if (!requestSecret) return false
+
+  const expectedBuffer = Buffer.from(webhookSecret)
+  const actualBuffer = Buffer.from(requestSecret)
+
+  return expectedBuffer.length === actualBuffer.length && crypto.timingSafeEqual(expectedBuffer, actualBuffer)
+}
+
+function isAuthorizedWebhook(request: Request, params: URLSearchParams) {
+  if (hasValidWebhookSecret(request)) return true
+  if (process.env.TWILIO_VALIDATE_WEBHOOKS === 'false') return true
+
+  return isValidTwilioSignature(request, params)
 }
 
 async function submitSmsLead(params: URLSearchParams) {
@@ -70,7 +90,7 @@ export async function POST(request: Request) {
   const rawBody = await request.text()
   const params = new URLSearchParams(rawBody)
 
-  if (process.env.TWILIO_VALIDATE_WEBHOOKS !== 'false' && !isValidTwilioSignature(request, params)) {
+  if (!isAuthorizedWebhook(request, params)) {
     return NextResponse.json({ ok: false }, { status: 403 })
   }
 

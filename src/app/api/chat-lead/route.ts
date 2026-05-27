@@ -24,15 +24,16 @@ function looksLikeSpam(message: string) {
 
 async function sendTwilioSms(body: string) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID
-  const authToken = process.env.TWILIO_AUTH_TOKEN
+  const apiUsername = process.env.TWILIO_API_KEY_SID || accountSid
+  const apiPassword = process.env.TWILIO_API_KEY_SECRET || process.env.TWILIO_AUTH_TOKEN
   const fromNumber = process.env.TWILIO_FROM_NUMBER || process.env.NEXT_PUBLIC_TEXT_NUMBER
   const ownerNumber = process.env.TWILIO_OWNER_TO_NUMBER
 
-  if (!accountSid || !authToken || !fromNumber || !ownerNumber) {
+  if (!accountSid || !apiUsername || !apiPassword || !fromNumber || !ownerNumber) {
     return { ok: false, skipped: true }
   }
 
-  const auth = Buffer.from(`${accountSid}:${authToken}`).toString('base64')
+  const auth = Buffer.from(`${apiUsername}:${apiPassword}`).toString('base64')
   const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
     method: 'POST',
     headers: {

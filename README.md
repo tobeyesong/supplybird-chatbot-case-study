@@ -36,9 +36,13 @@ OWNER_INVITE_CODE=
 OWNER_ACCESS_SECRET=
 ADMIN_ALLOWED_EMAILS=
 TWILIO_ACCOUNT_SID=
+TWILIO_API_KEY_SID=
+TWILIO_API_KEY_SECRET=
 TWILIO_AUTH_TOKEN=
-TWILIO_FROM_NUMBER=+19499430957
-TWILIO_OWNER_TO_NUMBER=
+TWILIO_FROM_NUMBER=+12729991986
+TWILIO_OWNER_TO_NUMBER=+19499430957
+TWILIO_WEBHOOK_SECRET=
+TWILIO_WEBHOOK_AUTH_TOKEN=
 ```
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported if the project still uses legacy anon key naming.
@@ -57,12 +61,14 @@ Use `ADMIN_ALLOWED_EMAILS` for explicit creator/admin access, for example `you@e
 
 The chatbot submits to the Netlify Form named `modhaus-chat`. Add a Netlify form submission email notification for that form and send it to `modhausllc@gmail.com`.
 
-When Twilio environment variables are present, each valid chatbot lead also sends an SMS alert from the Twilio number to the owner number. Keep `TWILIO_AUTH_TOKEN` out of Git and rotate it if it is ever pasted into chat.
+`NEXT_PUBLIC_TEXT_NUMBER` is the public click-to-text number shown to shoppers. `TWILIO_FROM_NUMBER` is only the Twilio-owned sender used for server-side SMS notifications.
+
+When Twilio environment variables are present, each valid chatbot lead also sends an SMS alert from the Twilio number to the owner number. Prefer `TWILIO_API_KEY_SID` and `TWILIO_API_KEY_SECRET` over the main Auth Token. Keep all Twilio secrets out of Git and rotate them if they are ever pasted into chat.
 
 Set the Twilio number inbound messaging webhook to:
 
 ```text
-https://modhauschat.netlify.app/api/twilio/sms
+https://modhauschat.netlify.app/api/twilio/sms?secret=TWILIO_WEBHOOK_SECRET
 ```
 
 Use `POST`. Inbound texts are captured as Netlify form leads and receive the same short thank-you reply.
