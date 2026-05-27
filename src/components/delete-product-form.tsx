@@ -10,7 +10,7 @@ function DeleteSubmitButton() {
 
   return (
     <button
-      className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-danger px-5 py-2.5 text-sm font-bold text-white hover:bg-danger/88 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-danger px-5 py-3 text-base font-bold text-white hover:bg-danger/88 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-11 sm:w-auto sm:py-2.5 sm:text-sm"
       type="submit"
       disabled={pending}
     >
@@ -48,12 +48,12 @@ export function DeleteProductForm({
         tone="danger"
       >
         <div className="flex items-start gap-4">
-          <div className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-danger-soft text-danger">
-            <AlertTriangle className="size-5" aria-hidden="true" />
+          <div className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-danger-soft text-danger sm:size-11">
+            <AlertTriangle className="size-5 sm:size-4" aria-hidden="true" />
           </div>
           <div>
             <p className="font-black">Permanent change</p>
-            <p className="mt-2 text-sm leading-6 text-muted">
+            <p className="mt-2 text-base/7 text-muted sm:text-sm/6">
               Delete <span className="font-bold text-foreground">{productTitle}</span>? This removes the product from the admin inventory and public catalog.
             </p>
           </div>
@@ -62,7 +62,7 @@ export function DeleteProductForm({
         <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-5 sm:flex-row sm:justify-end">
           <button
             type="button"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-surface-warm px-5 py-2.5 text-sm font-bold text-foreground hover:bg-brand-soft sm:w-auto"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-surface-warm px-5 py-3 text-base font-bold text-foreground hover:bg-brand-soft sm:min-h-11 sm:w-auto sm:py-2.5 sm:text-sm"
             onClick={() => setIsOpen(false)}
           >
             Cancel

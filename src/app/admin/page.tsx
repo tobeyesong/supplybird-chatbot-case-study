@@ -1,12 +1,12 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { Edit, Plus } from 'lucide-react'
 import { deleteProduct, updateCategoryPricing } from '@/app/admin/products/actions'
 import { AdminLogoutButton } from '@/components/admin-logout-button'
 import { AdminToasts, type AdminToastMessage } from '@/components/admin-toasts'
 import { DeleteProductForm } from '@/components/delete-product-form'
+import { ProductImage } from '@/components/product-image'
 import { getCategorySettings, normalizeProduct } from '@/lib/catalog'
-import { fallbackProducts } from '@/lib/catalog-data'
+import { categories, fallbackProducts } from '@/lib/catalog-data'
 import { formatCoverage, formatPrice, formatUnitPrice } from '@/lib/format'
 import { requireOwner } from '@/lib/supabase/auth'
 
@@ -65,6 +65,10 @@ function getAdminToast(params: Awaited<PageProps['searchParams']>): AdminToastMe
   return null
 }
 
+function unitLabel(priceUnit: string) {
+  return formatUnitPrice(1, priceUnit).replace('$1 / ', '')
+}
+
 export default async function AdminPage({ searchParams }: PageProps) {
   const { supabase, user } = await requireOwner()
   const params = await searchParams
@@ -78,8 +82,16 @@ export default async function AdminPage({ searchParams }: PageProps) {
         .then(({ data, error }) => ({ products: data?.map(normalizeProduct) ?? [], error }))
     : { products: fallbackProducts, error: null }
   const categorySettings = await getCategorySettings()
-  const flooringSetting = categorySettings.find((setting) => setting.category === 'flooring')
-  const roofingSetting = categorySettings.find((setting) => setting.category === 'roofing')
+  const categorySettingsBySlug = new Map(categorySettings.map((setting) => [setting.category, setting]))
+  const pricingRows = categories.map((category) => ({
+    category,
+    setting: categorySettingsBySlug.get(category.slug) ?? {
+      category: category.slug,
+      default_price: category.default_price,
+      price_unit: category.price_unit,
+      updated_at: null,
+    },
+  }))
 
   return (
     <section className="section-y">
@@ -115,29 +127,27 @@ export default async function AdminPage({ searchParams }: PageProps) {
               <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">Default pricing</p>
               <h2 className="mt-2 text-2xl font-black tracking-normal">Category starting prices</h2>
               <p className="mt-2 max-w-2xl text-muted">
-                These values control the public “starting at” prices for Flooring and Roofing.
+                These values control the public “starting at” prices for each shop category.
               </p>
             </div>
-            <div className="grid gap-2 text-sm text-muted">
-              <p>
-                Flooring: <span className="font-bold text-foreground">{formatUnitPrice(flooringSetting?.default_price ?? 0.99, 'sq_ft')}</span>
-              </p>
-              <p>
-                Roofing: <span className="font-bold text-foreground">{formatUnitPrice(roofingSetting?.default_price ?? 0, 'sq_ft')}</span>
-              </p>
+            <div className="grid gap-2 text-base text-muted sm:text-sm md:text-right">
+              {pricingRows.map(({ category, setting }) => (
+                <p key={category.slug}>
+                  {category.name}: <span className="font-bold text-foreground">{formatUnitPrice(setting.default_price, setting.price_unit)}</span>
+                </p>
+              ))}
             </div>
           </div>
 
-          <form action={updateCategoryPricing} className="mt-6 grid gap-5 md:grid-cols-[1fr_1fr_auto] md:items-end">
-            <label className="grid gap-2 text-sm font-semibold">
-              Flooring price per sq.ft.
-              <input className="field" name="flooring_default_price" type="number" step="0.01" min="0" defaultValue={flooringSetting?.default_price ?? 0.99} />
-            </label>
-            <label className="grid gap-2 text-sm font-semibold">
-              Roofing price per sq.ft.
-              <input className="field" name="roofing_default_price" type="number" step="0.01" min="0" defaultValue={roofingSetting?.default_price ?? 0} />
-            </label>
-            <button className="min-h-11 rounded-lg bg-foreground px-5 py-2.5 text-sm font-bold text-background hover:bg-foreground/88" type="submit">
+          <form action={updateCategoryPricing} className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_auto] xl:items-end">
+            {pricingRows.map(({ category, setting }) => (
+              <label key={category.slug} className="grid gap-2 text-base font-semibold sm:text-sm">
+                {category.name} price per {unitLabel(setting.price_unit)}
+                <input className="field" name={`${category.slug}_default_price`} type="number" step="0.01" min="0" defaultValue={setting.default_price} />
+                <input name={`${category.slug}_price_unit`} type="hidden" value={setting.price_unit} />
+              </label>
+            ))}
+            <button className="min-h-12 rounded-lg bg-foreground px-5 py-3 text-base font-bold text-background hover:bg-foreground/88 sm:min-h-11 sm:py-2.5 sm:text-sm md:col-span-2 xl:col-span-1" type="submit">
               Save pricing
             </button>
           </form>
@@ -156,7 +166,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
                 <div key={product.id} className="grid gap-4 p-5 md:grid-cols-[1fr_140px_160px_128px] md:items-center">
                   <div className="flex items-center gap-4">
                     <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-surface-warm">
-                      <Image src={product.images[0] || '/supplybird-assets/flooring.png'} alt="" fill sizes="64px" className="object-cover" />
+                      <ProductImage src={product.images[0] || '/supplybird-assets/flooring.png'} alt="" className="h-full w-full object-cover" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-bold">{product.title}</p>

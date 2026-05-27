@@ -1,22 +1,22 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { FormEvent, useMemo, useState, useTransition } from 'react'
+import type { BaseSyntheticEvent } from 'react'
+import { useMemo, useState, useTransition } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { categories } from '@/lib/catalog-data'
+import {
+  productCoverageUnits,
+  productFormSchema,
+  productPriceUnits,
+  type ParsedProductFormValues,
+  type ProductFormValues,
+} from '@/lib/product-form-schema'
 import { getBrowserSupabaseClient } from '@/lib/supabase/client'
 import type { Product } from '@/lib/types'
 
 const productImageBucket = 'product-images'
-
-const priceUnits = [
-  ['sq_ft', 'Square foot'],
-  ['ln_ft', 'Linear foot'],
-  ['box', 'Box'],
-  ['bundle', 'Bundle'],
-  ['board', 'Board'],
-  ['roll', 'Roll'],
-  ['unit', 'Unit'],
-] as const
 
 type ProductFormProps = {
   product?: Product
@@ -43,19 +43,65 @@ function uploadErrorMessage(message: string) {
   return message
 }
 
+function fieldClassName(hasError: boolean) {
+  return ['field', hasError ? 'border-danger bg-danger-soft/20' : ''].filter(Boolean).join(' ')
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) {
+    return null
+  }
+
+  return (
+    <p className="text-sm font-semibold text-danger" role="alert">
+      {message}
+    </p>
+  )
+}
+
 export function ProductForm({ product, submitLabel, action, error }: ProductFormProps) {
-  const [imageUrls, setImageUrls] = useState(product?.images.join('\n') ?? '')
   const [clientError, setClientError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ProductFormValues, unknown, ParsedProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      title: product?.title ?? '',
+      slug: product?.slug ?? '',
+      description: product?.description ?? '',
+      category: product?.category ?? 'flooring',
+      subcategory: product?.subcategory ?? '',
+      price: product?.price ?? 0,
+      price_unit: product?.price_unit ?? 'sq_ft',
+      coverage_per_box: product?.coverage_per_box ?? '',
+      coverage_unit: product?.coverage_unit ?? '',
+      image_urls: product?.images.join('\n') ?? '',
+      images: product?.images.join('\n') ?? '',
+      in_stock: product?.in_stock ?? true,
+      featured: product?.featured ?? false,
+    },
+  })
 
+  const imageUrls = useWatch({ control, name: 'image_urls' }) || ''
   const imagePreview = useMemo(() => imageUrls.split(/\n|,/).map((url) => url.trim()).filter(Boolean), [imageUrls])
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  async function onValidSubmit(_values: ParsedProductFormValues, event?: BaseSyntheticEvent) {
     setClientError(null)
 
-    const form = event.currentTarget
+    const form = event?.currentTarget instanceof HTMLFormElement ? event.currentTarget : null
+    if (!form) {
+      setClientError('The form is not ready. Refresh and try again.')
+      return
+    }
+
     const formData = new FormData(form)
+    const currentImageUrls = String(formData.get('image_urls') || '')
+    const currentImagePreview = currentImageUrls.split(/\n|,/).map((url) => url.trim()).filter(Boolean)
     const files = formData.getAll('new_images').filter((file): file is File => file instanceof File && file.size > 0)
     const uploadedUrls: string[] = []
 
@@ -84,7 +130,7 @@ export function ProductForm({ product, submitLabel, action, error }: ProductForm
       }
     }
 
-    const mergedImages = [...imagePreview, ...uploadedUrls]
+    const mergedImages = [...currentImagePreview, ...uploadedUrls]
     formData.set('images', mergedImages.join('\n'))
     formData.delete('new_images')
 
@@ -94,7 +140,7 @@ export function ProductForm({ product, submitLabel, action, error }: ProductForm
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid gap-5" noValidate onSubmit={handleSubmit(onValidSubmit, () => setClientError('Fix the highlighted fields before saving.'))}>
       {error || clientError ? (
         <div className="rounded-lg bg-danger-soft p-4 text-sm font-semibold text-danger">{clientError || error}</div>
       ) : null}
@@ -102,74 +148,94 @@ export function ProductForm({ product, submitLabel, action, error }: ProductForm
       <div className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-semibold">
           Product title
-          <input className="field" name="title" defaultValue={product?.title ?? ''} required />
+          <input className={fieldClassName(Boolean(errors.title))} aria-invalid={Boolean(errors.title)} {...register('title')} />
+          <FieldError message={errors.title?.message} />
         </label>
         <label className="grid gap-2 text-sm font-semibold">
           URL slug
-          <input className="field" name="slug" defaultValue={product?.slug ?? ''} placeholder="rustic-oak-vinyl" />
+          <input className={fieldClassName(Boolean(errors.slug))} placeholder="rustic-oak-vinyl" aria-invalid={Boolean(errors.slug)} {...register('slug')} />
+          <FieldError message={errors.slug?.message} />
         </label>
       </div>
 
       <label className="grid gap-2 text-sm font-semibold">
         Description
-        <textarea className="field min-h-32 resize-none" name="description" defaultValue={product?.description ?? ''} />
+        <textarea className={`${fieldClassName(Boolean(errors.description))} min-h-32 resize-none`} aria-invalid={Boolean(errors.description)} {...register('description')} />
+        <FieldError message={errors.description?.message} />
       </label>
 
       <div className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-semibold">
           Category
-          <select className="field" name="category" defaultValue={product?.category ?? 'flooring'}>
+          <select className={fieldClassName(Boolean(errors.category))} aria-invalid={Boolean(errors.category)} {...register('category')}>
             {categories.map((category) => (
               <option key={category.slug} value={category.slug}>
                 {category.name}
               </option>
             ))}
           </select>
+          <FieldError message={errors.category?.message} />
         </label>
         <label className="grid gap-2 text-sm font-semibold">
           Subcategory
-          <input className="field" name="subcategory" defaultValue={product?.subcategory ?? ''} placeholder="vinyl" />
+          <input className={fieldClassName(Boolean(errors.subcategory))} placeholder="vinyl" aria-invalid={Boolean(errors.subcategory)} {...register('subcategory')} />
+          <FieldError message={errors.subcategory?.message} />
         </label>
       </div>
 
       <div className="grid gap-5 md:grid-cols-4">
         <label className="grid gap-2 text-sm font-semibold md:col-span-2">
           Price
-          <input className="field" name="price" type="number" step="0.01" min="0" defaultValue={product?.price ?? 0} required />
+          <input className={fieldClassName(Boolean(errors.price))} type="number" step="0.01" min="0" aria-invalid={Boolean(errors.price)} {...register('price')} />
+          <FieldError message={errors.price?.message} />
         </label>
         <label className="grid gap-2 text-sm font-semibold md:col-span-2">
           Price unit
-          <select className="field" name="price_unit" defaultValue={product?.price_unit ?? 'sq_ft'}>
-            {priceUnits.map(([value, label]) => (
+          <select className={fieldClassName(Boolean(errors.price_unit))} aria-invalid={Boolean(errors.price_unit)} {...register('price_unit')}>
+            {productPriceUnits.map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
           </select>
+          <FieldError message={errors.price_unit?.message} />
         </label>
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-semibold">
           Coverage per box
-          <input className="field" name="coverage_per_box" type="number" step="0.01" min="0" defaultValue={product?.coverage_per_box ?? ''} placeholder="23.6" />
+          <input
+            className={fieldClassName(Boolean(errors.coverage_per_box))}
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="23.6"
+            aria-invalid={Boolean(errors.coverage_per_box)}
+            {...register('coverage_per_box')}
+          />
+          <FieldError message={errors.coverage_per_box?.message} />
         </label>
         <label className="grid gap-2 text-sm font-semibold">
           Coverage unit
-          <select className="field" name="coverage_unit" defaultValue={product?.coverage_unit ?? 'sq_ft'}>
-            <option value="">None</option>
-            <option value="sq_ft">Square feet</option>
-            <option value="ln_ft">Linear feet</option>
+          <select className={fieldClassName(Boolean(errors.coverage_unit))} aria-invalid={Boolean(errors.coverage_unit)} {...register('coverage_unit')}>
+            {productCoverageUnits.map(([value, label]) => (
+              <option key={value || 'none'} value={value}>
+                {label}
+              </option>
+            ))}
           </select>
+          <FieldError message={errors.coverage_unit?.message} />
         </label>
       </div>
 
       <div className="grid gap-4">
         <label className="grid gap-2 text-sm font-semibold">
           Image URLs
-          <textarea className="field min-h-28 resize-none" name="image_urls" value={imageUrls} onChange={(event) => setImageUrls(event.target.value)} placeholder="One image URL per line" />
+          <textarea className={`${fieldClassName(Boolean(errors.image_urls))} min-h-28 resize-none`} placeholder="One image URL per line" aria-invalid={Boolean(errors.image_urls)} {...register('image_urls')} />
+          <FieldError message={errors.image_urls?.message} />
         </label>
-        <input type="hidden" name="images" value={imageUrls} />
+        <input type="hidden" value={imageUrls} {...register('images')} />
         <label className="grid gap-2 text-sm font-semibold">
           Upload new images
           <span className="flex min-h-24 cursor-pointer items-center justify-center rounded-lg border border-dashed border-border bg-surface px-4 py-5 text-center text-sm text-muted hover:bg-surface-warm">
@@ -195,11 +261,11 @@ export function ProductForm({ product, submitLabel, action, error }: ProductForm
 
       <div className="grid gap-3 rounded-lg bg-surface-warm p-4 sm:grid-cols-2">
         <label className="flex items-center gap-3 text-sm font-semibold">
-          <input className="size-4 accent-brand" name="in_stock" type="checkbox" defaultChecked={product?.in_stock ?? true} />
+          <input className="size-4 accent-brand" type="checkbox" {...register('in_stock')} />
           In stock
         </label>
         <label className="flex items-center gap-3 text-sm font-semibold">
-          <input className="size-4 accent-brand" name="featured" type="checkbox" defaultChecked={product?.featured ?? false} />
+          <input className="size-4 accent-brand" type="checkbox" {...register('featured')} />
           Featured on homepage
         </label>
       </div>

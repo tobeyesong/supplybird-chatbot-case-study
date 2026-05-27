@@ -1,9 +1,16 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { MessageCircle, MessageSquare } from 'lucide-react'
 import { textHref } from '@/lib/business'
 
 export function MobileContactBar() {
+  const pathname = usePathname()
+
+  if (pathname.startsWith('/admin')) {
+    return null
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/96 px-4 py-3 shadow-float backdrop-blur md:hidden">
       <div className="mx-auto flex max-w-md gap-2">

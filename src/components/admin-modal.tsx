@@ -62,7 +62,7 @@ export function AdminModal({
 
   return (
     <div className="fixed inset-0 z-[80] overflow-y-auto">
-      <div className="flex min-h-dvh items-center justify-center px-4 py-8">
+      <div className="flex min-h-dvh items-end justify-center px-0 pb-0 pt-8 sm:items-center sm:px-4 sm:py-8">
         <button
           type="button"
           aria-label="Close modal"
@@ -75,31 +75,31 @@ export function AdminModal({
           aria-modal="true"
           aria-labelledby={titleId}
           tabIndex={-1}
-          className="relative w-full max-w-xl overflow-hidden rounded-lg border border-border bg-background text-left shadow-float focus:outline-none"
+          className="relative flex max-h-[calc(100dvh-0.75rem)] w-full flex-col overflow-hidden rounded-t-lg border border-border bg-background text-left shadow-float focus:outline-none sm:max-h-[calc(100dvh-4rem)] sm:max-w-xl sm:rounded-lg"
         >
           <div className={isDanger ? 'h-1 bg-danger' : 'h-1 bg-brand'} />
-          <div className="bg-foreground p-5 text-background sm:p-6">
+          <div className="shrink-0 bg-foreground p-5 text-background sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className={isDanger ? 'text-xs font-bold uppercase tracking-wide text-red-100' : 'text-xs font-bold uppercase tracking-wide text-brand-soft'}>
                   {eyebrow}
                 </p>
-                <h2 id={titleId} className="mt-3 text-2xl font-black tracking-normal text-white">
+                <h2 id={titleId} className="mt-3 text-2xl font-black tracking-normal text-white sm:text-2xl">
                   {title}
                 </h2>
-                {description ? <p className="mt-2 max-w-md text-sm leading-6 text-background/72">{description}</p> : null}
+                {description ? <p className="mt-2 max-w-md text-base/7 text-background/72 sm:text-sm/6">{description}</p> : null}
               </div>
               <button
                 type="button"
-                className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/16"
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/16 sm:size-10"
                 aria-label="Close modal"
                 onClick={onClose}
               >
-                <X className="size-4" aria-hidden="true" />
+                <X className="size-5 sm:size-4" aria-hidden="true" />
               </button>
             </div>
           </div>
-          <div className="bg-surface p-5 sm:p-6">{children}</div>
+          <div className="overflow-y-auto bg-surface p-5 sm:p-6">{children}</div>
         </div>
       </div>
     </div>

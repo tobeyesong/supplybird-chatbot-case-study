@@ -1,6 +1,7 @@
 'use client'
 
 import Script from 'next/script'
+import { usePathname } from 'next/navigation'
 import { Mail, MessageCircle, Send, X } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
 import { emailHref, textHref } from '@/lib/business'
@@ -10,6 +11,7 @@ type ContactChannel = 'text' | 'email'
 
 export function ChatbotEmbed() {
   const scriptSrc = process.env.NEXT_PUBLIC_CHATBOT_EMBED_SRC
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [state, setState] = useState<ChatState>('idle')
   const [channel, setChannel] = useState<ContactChannel>('text')
@@ -20,6 +22,10 @@ export function ChatbotEmbed() {
     window.addEventListener('modhaus:open-chat', handler)
     return () => window.removeEventListener('modhaus:open-chat', handler)
   }, [])
+
+  if (pathname.startsWith('/admin')) {
+    return null
+  }
 
   if (scriptSrc) {
     return <Script src={scriptSrc} strategy="afterInteractive" />
@@ -79,7 +85,7 @@ export function ChatbotEmbed() {
       </button>
 
       {open ? (
-        <div className="fixed inset-x-4 bottom-24 z-50 mx-auto max-h-[calc(100dvh-8rem)] max-w-md overflow-y-auto md:bottom-24 md:left-auto md:right-6 md:mx-0">
+        <div className="fixed inset-x-0 bottom-20 z-50 mx-auto max-h-[calc(100dvh-6rem)] overflow-y-auto px-3 sm:inset-x-4 sm:bottom-24 sm:max-w-md sm:px-0 md:left-auto md:right-6 md:mx-0">
           <div className="overflow-hidden rounded-lg bg-surface shadow-float">
             <div className="flex items-center justify-between bg-foreground px-5 py-4 text-background">
               <div>
@@ -102,7 +108,7 @@ export function ChatbotEmbed() {
                 <p className="mt-2 text-base text-muted">We will reply shortly.</p>
                 <button
                   type="button"
-                  className="mt-5 min-h-11 w-full rounded-lg bg-brand px-4 py-2.5 text-base font-bold text-white hover:bg-brand-dark sm:text-sm"
+                  className="mt-5 min-h-12 w-full rounded-lg bg-brand px-4 py-3 text-base font-bold text-white hover:bg-brand-dark sm:min-h-11 sm:py-2.5 sm:text-sm"
                   onClick={() => {
                     setState('idle')
                     setOpen(false)
@@ -118,7 +124,7 @@ export function ChatbotEmbed() {
                   <button
                     type="button"
                     onClick={() => setChannel('text')}
-                    className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-bold transition ${
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-3 text-base font-bold transition sm:min-h-11 sm:text-sm ${
                       channel === 'text' ? 'bg-foreground text-background shadow-card' : 'text-foreground hover:bg-background'
                     }`}
                     aria-pressed={channel === 'text'}
@@ -129,7 +135,7 @@ export function ChatbotEmbed() {
                   <button
                     type="button"
                     onClick={() => setChannel('email')}
-                    className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-bold transition ${
+                    className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-3 text-base font-bold transition sm:min-h-11 sm:text-sm ${
                       channel === 'email' ? 'bg-foreground text-background shadow-card' : 'text-foreground hover:bg-background'
                     }`}
                     aria-pressed={channel === 'email'}

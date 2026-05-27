@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, MessageSquare } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { CoverageCalculator } from '@/components/coverage-calculator'
 import { ProductCard } from '@/components/product-card'
+import { ProductImage } from '@/components/product-image'
 import { textHref } from '@/lib/business'
 import { formatCoverage, formatPrice } from '@/lib/format'
 import { getProduct, getRelatedProducts, isProductCategory } from '@/lib/catalog'
@@ -60,21 +60,17 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="mt-8 grid gap-10 lg:grid-cols-[1.08fr_0.92fr]">
             <div className="grid gap-4">
               <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface-warm shadow-card">
-                <Image
+                <ProductImage
                   src={images[0]}
                   alt={product.title}
-                  fill
-                  sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-cover"
-                  loading="eager"
-                  priority
+                  className="h-full w-full object-cover"
                 />
               </div>
               {images.length > 1 ? (
                 <div className="grid grid-cols-4 gap-4">
                   {images.slice(1, 5).map((image) => (
                     <div key={image} className="relative aspect-square overflow-hidden rounded-lg bg-surface-warm shadow-card">
-                      <Image src={image} alt="" fill sizes="20vw" className="object-cover" />
+                      <ProductImage src={image} alt="" className="h-full w-full object-cover" />
                     </div>
                   ))}
                 </div>
@@ -121,7 +117,7 @@ export default async function ProductPage({ params }: PageProps) {
         <section className="section-y bg-surface-warm">
           <div className="page-container">
             <h2 className="text-3xl font-black tracking-normal">Related products</h2>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
               {relatedProducts.map((relatedProduct) => (
                 <ProductCard key={relatedProduct.id} product={relatedProduct} />
               ))}

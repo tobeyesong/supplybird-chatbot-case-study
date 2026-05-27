@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ChevronDown, Hammer, Info, Layers, Menu, MessageCircle, MessageSquare, Package, Phone, Warehouse, X } from 'lucide-react'
 import { useState } from 'react'
 import { business, phoneHref, textHref } from '@/lib/business'
@@ -21,6 +22,8 @@ function openChatbot() {
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname()
+  const isAdminRoute = pathname.startsWith('/admin')
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
@@ -82,21 +85,25 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={openChatbot}
-            className="hidden min-h-11 items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-card transition hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:inline-flex"
-          >
-            <MessageCircle className="size-4" aria-hidden="true" />
-            Chat
-          </button>
-          <a
-            href={textHref()}
-            className="hidden min-h-11 items-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-bold text-background transition hover:bg-foreground/88 md:inline-flex"
-          >
-            <MessageSquare className="size-4" aria-hidden="true" />
-            Text
-          </a>
+          {!isAdminRoute ? (
+            <>
+              <button
+                type="button"
+                onClick={openChatbot}
+                className="hidden min-h-11 items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-card transition hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:inline-flex"
+              >
+                <MessageCircle className="size-4" aria-hidden="true" />
+                Chat
+              </button>
+              <a
+                href={textHref()}
+                className="hidden min-h-11 items-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-bold text-background transition hover:bg-foreground/88 md:inline-flex"
+              >
+                <MessageSquare className="size-4" aria-hidden="true" />
+                Text
+              </a>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => setMobileOpen((isOpen) => !isOpen)}
