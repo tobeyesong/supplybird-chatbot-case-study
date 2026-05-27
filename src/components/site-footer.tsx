@@ -50,11 +50,8 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-background/10">
-        <div className="page-container flex flex-col gap-3 py-5 text-sm text-background/56 md:flex-row md:items-center md:justify-between">
+        <div className="page-container py-5 text-sm text-background/56">
           <p>© {new Date().getFullYear()} {business.name}. All rights reserved.</p>
-          <Link href="/admin/login" className="w-fit hover:text-background">
-            Owner login
-          </Link>
         </div>
       </div>
     </footer>
