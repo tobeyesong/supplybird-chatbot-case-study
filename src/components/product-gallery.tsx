@@ -62,8 +62,8 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
               <button
                 key={`${image}-${imageIndex}`}
                 type="button"
-                className={`relative aspect-square overflow-hidden rounded-lg bg-surface-warm shadow-card ring-offset-2 ring-offset-background transition ${
-                  isSelected ? 'ring-2 ring-brand' : 'hover:ring-2 hover:ring-border'
+                className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-surface-warm shadow-card transition ${
+                  isSelected ? 'border-brand' : 'border-transparent hover:border-border'
                 }`}
                 aria-label={`View image ${imageIndex + 1} for ${title}`}
                 aria-pressed={isSelected}

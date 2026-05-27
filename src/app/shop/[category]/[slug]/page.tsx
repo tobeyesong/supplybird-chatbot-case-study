@@ -57,7 +57,7 @@ export default async function ProductPage({ params }: PageProps) {
             Back to {product.category}
           </Link>
 
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="mt-8 grid gap-10 lg:grid-cols-2">
             <ProductGallery images={images} title={product.title} />
 
             <div className="grid content-start gap-6">
@@ -81,7 +81,7 @@ export default async function ProductPage({ params }: PageProps) {
 
               <CoverageCalculator coveragePerBox={product.coverage_per_box} price={product.price} priceUnit={product.price_unit} />
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                 <ChatOpenButton label="Chat" />
                 <a
                   href={textHref()}
