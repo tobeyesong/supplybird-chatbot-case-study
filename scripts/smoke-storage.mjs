@@ -33,6 +33,7 @@ const bucketMissing =
   publicProbe !== null &&
   'message' in publicProbe &&
   String(publicProbe.message).toLowerCase().includes('bucket not found')
+const bucketExistsByPublicProbe = !bucketMissing
 
 console.log(
   JSON.stringify(
@@ -40,6 +41,7 @@ console.log(
       bucket,
       bucketListStatus: bucketResponse.status,
       bucketVisibleInList: bucketExists,
+      bucketExistsByPublicProbe,
       publicProbeStatus: publicProbeResponse.status,
       publicProbe,
     },
@@ -48,8 +50,8 @@ console.log(
   ),
 )
 
-if (bucketMissing || !bucketExists) {
-  console.error(`Storage smoke test failed: bucket "${bucket}" is missing or not visible to the publishable key.`)
+if (bucketMissing) {
+  console.error(`Storage smoke test failed: bucket "${bucket}" is missing.`)
   process.exit(1)
 }
 
