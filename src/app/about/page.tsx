@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <>
-      <section className="section-y">
+    <div className="min-h-screen bg-surface-warm">
+      <section className="section-y bg-background">
         <div className="page-container grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">{business.city}</p>
@@ -63,6 +63,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }
