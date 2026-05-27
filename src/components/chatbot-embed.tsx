@@ -1,16 +1,18 @@
 'use client'
 
 import Script from 'next/script'
-import { MessageCircle, Send, X } from 'lucide-react'
+import { Mail, MessageCircle, Send, X } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
-import { textHref } from '@/lib/business'
+import { emailHref, textHref } from '@/lib/business'
 
 type ChatState = 'idle' | 'sending' | 'sent'
+type ContactChannel = 'text' | 'email'
 
 export function ChatbotEmbed() {
   const scriptSrc = process.env.NEXT_PUBLIC_CHATBOT_EMBED_SRC
   const [open, setOpen] = useState(false)
   const [state, setState] = useState<ChatState>('idle')
+  const [channel, setChannel] = useState<ContactChannel>('text')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -35,6 +37,7 @@ export function ChatbotEmbed() {
     const body = new URLSearchParams({
       'form-name': 'modhaus-chat',
       'bot-field': '',
+      channel,
       phone,
       email,
       message,
@@ -53,10 +56,14 @@ export function ChatbotEmbed() {
       }
 
       setState('sent')
-      window.location.href = textHref(`Hi ModHaus, ${message}\n\nMy phone: ${phone}\nMy email: ${email}`)
+      if (channel === 'text') {
+        window.location.href = textHref(`Hi ModHaus, ${message}${phone ? `\n\nMy phone: ${phone}` : ''}`)
+      } else {
+        window.location.href = emailHref('ModHaus inventory request', `${message}${email ? `\n\nMy email: ${email}` : ''}`)
+      }
     } catch {
       setState('idle')
-      setError('Could not send the message. Please text instead.')
+      setError('Could not open that channel. Please try the other option.')
     }
   }
 
@@ -107,14 +114,41 @@ export function ChatbotEmbed() {
             ) : (
               <form className="grid gap-4 p-5" onSubmit={handleSubmit}>
                 {error ? <div className="rounded-lg bg-danger-soft p-4 text-sm font-semibold text-danger">{error}</div> : null}
-                <label className="grid gap-2 text-base font-semibold sm:text-sm">
-                  Phone number
-                  <input className="field" name="phone" type="tel" placeholder="(555) 123-4567" required />
-                </label>
-                <label className="grid gap-2 text-base font-semibold sm:text-sm">
-                  Email
-                  <input className="field" name="email" type="email" placeholder="you@example.com" required />
-                </label>
+                <div className="grid grid-cols-2 gap-1 rounded-lg bg-surface-warm p-1">
+                  <button
+                    type="button"
+                    onClick={() => setChannel('text')}
+                    className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-bold transition ${
+                      channel === 'text' ? 'bg-foreground text-background shadow-card' : 'text-foreground hover:bg-background'
+                    }`}
+                    aria-pressed={channel === 'text'}
+                  >
+                    <MessageCircle className="size-4" aria-hidden="true" />
+                    Text
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChannel('email')}
+                    className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-3 text-sm font-bold transition ${
+                      channel === 'email' ? 'bg-foreground text-background shadow-card' : 'text-foreground hover:bg-background'
+                    }`}
+                    aria-pressed={channel === 'email'}
+                  >
+                    <Mail className="size-4" aria-hidden="true" />
+                    Email
+                  </button>
+                </div>
+                {channel === 'text' ? (
+                  <label className="grid gap-2 text-base font-semibold sm:text-sm">
+                    Phone number
+                    <input className="field" name="phone" type="tel" placeholder="(555) 123-4567" required />
+                  </label>
+                ) : (
+                  <label className="grid gap-2 text-base font-semibold sm:text-sm">
+                    Email
+                    <input className="field" name="email" type="email" placeholder="you@example.com" required />
+                  </label>
+                )}
                 <label className="grid gap-2 text-base font-semibold sm:text-sm">
                   Message
                   <textarea className="field min-h-28 resize-none" name="message" placeholder="Tell us what you need." required />
@@ -124,7 +158,7 @@ export function ChatbotEmbed() {
                   disabled={state === 'sending'}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-bold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
-                  {state === 'sending' ? 'Sending...' : 'Send message'}
+                  {state === 'sending' ? 'Sending...' : channel === 'text' ? 'Send text' : 'Send email'}
                   <Send className="size-4" aria-hidden="true" />
                 </button>
               </form>

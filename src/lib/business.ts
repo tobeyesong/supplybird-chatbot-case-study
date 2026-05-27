@@ -1,7 +1,9 @@
 const defaultPhoneNumber = '+19499430957'
 const defaultTextNumber = '+19499430957'
+const defaultEmailAddress = 'modhausllc@gmail.com'
 const phoneNumber = process.env.NEXT_PUBLIC_PHONE_NUMBER || defaultPhoneNumber
 const textNumber = process.env.NEXT_PUBLIC_TEXT_NUMBER || defaultTextNumber
+const emailAddress = process.env.NEXT_PUBLIC_EMAIL_ADDRESS || defaultEmailAddress
 
 function formatPhoneDisplay(phone: string) {
   const digits = phone.replace(/\D/g, '')
@@ -22,6 +24,7 @@ export const business = {
   phoneNumber,
   textDisplay: formatPhoneDisplay(textNumber),
   textNumber,
+  emailAddress,
   instagramUrl: '#',
   facebookUrl: '#',
 }
@@ -33,4 +36,9 @@ export function phoneHref() {
 export function textHref(body?: string) {
   const encodedBody = body ? `?body=${encodeURIComponent(body)}` : ''
   return `sms:${business.textNumber}${encodedBody}`
+}
+
+export function emailHref(subject: string, body: string) {
+  const params = new URLSearchParams({ subject, body })
+  return `mailto:${business.emailAddress}?${params.toString()}`
 }
