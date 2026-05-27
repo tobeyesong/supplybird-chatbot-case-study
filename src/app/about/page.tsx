@@ -44,22 +44,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="section-y bg-surface-warm">
+      <section className="bg-surface-warm py-8 md:py-10">
         <div className="page-container grid gap-5 md:grid-cols-3">
-          <div className="surface-card p-6">
+          <div className="surface-card p-5 md:p-6">
             <MapPin className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Location</h2>
             <p className="mt-2 leading-7 text-muted">{business.address}</p>
           </div>
-          <div className="surface-card p-6">
+          <div className="surface-card p-5 md:p-6">
             <Clock className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Hours</h2>
             <p className="mt-2 leading-7 text-muted">{business.hours}</p>
           </div>
-          <div className="surface-card p-6">
+          <div className="surface-card p-5 md:p-6">
             <Phone className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Best way to check stock</h2>
-            <p className="mt-2 leading-7 text-muted">Send a product name, photo, or room size through chat or phone.</p>
+            <p className="mt-2 leading-7 text-muted">Send a product name, photo, or room size through chat or text.</p>
           </div>
         </div>
       </section>
