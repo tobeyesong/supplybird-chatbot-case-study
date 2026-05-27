@@ -97,3 +97,13 @@ boxes = Math.ceil((squareFeet * 1.10) / coverage_per_box)
 ```
 
 The admin product form exposes `coverage_per_box`, so each listing can drive its own calculator.
+
+## Storage Smoke Test
+
+Run this after applying `supabase/schema.sql`:
+
+```bash
+npm run smoke:storage
+```
+
+If it reports that `product-images` is missing, create the public Supabase Storage bucket by rerunning `supabase/schema.sql` in the Supabase SQL editor.

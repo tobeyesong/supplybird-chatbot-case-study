@@ -6,6 +6,8 @@ import { categories } from '@/lib/catalog-data'
 import { getBrowserSupabaseClient } from '@/lib/supabase/client'
 import type { Product } from '@/lib/types'
 
+const productImageBucket = 'product-images'
+
 const priceUnits = [
   ['sq_ft', 'Square foot'],
   ['ln_ft', 'Linear foot'],
@@ -25,6 +27,20 @@ type ProductFormProps = {
 
 function safeFileName(fileName: string) {
   return fileName.toLowerCase().replace(/[^a-z0-9.]+/g, '-')
+}
+
+function uploadErrorMessage(message: string) {
+  const normalizedMessage = message.toLowerCase()
+
+  if (normalizedMessage.includes('bucket not found')) {
+    return 'Supabase Storage bucket "product-images" is missing. Create the bucket or rerun supabase/schema.sql before uploading images.'
+  }
+
+  if (normalizedMessage.includes('row-level security') || normalizedMessage.includes('unauthorized') || normalizedMessage.includes('permission')) {
+    return 'This admin account can save products, but Supabase Storage is blocking image uploads. Rerun the latest storage policies in supabase/schema.sql.'
+  }
+
+  return message
 }
 
 export function ProductForm({ product, submitLabel, action, error }: ProductFormProps) {
@@ -53,17 +69,17 @@ export function ProductForm({ product, submitLabel, action, error }: ProductForm
 
       for (const file of files) {
         const path = `products/${crypto.randomUUID()}-${safeFileName(file.name)}`
-        const { error: uploadError } = await supabase.storage.from('product-images').upload(path, file, {
+        const { error: uploadError } = await supabase.storage.from(productImageBucket).upload(path, file, {
           cacheControl: '3600',
           upsert: false,
         })
 
         if (uploadError) {
-          setClientError(uploadError.message)
+          setClientError(uploadErrorMessage(uploadError.message))
           return
         }
 
-        const { data } = supabase.storage.from('product-images').getPublicUrl(path)
+        const { data } = supabase.storage.from(productImageBucket).getPublicUrl(path)
         uploadedUrls.push(data.publicUrl)
       }
     }

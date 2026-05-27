@@ -5,7 +5,9 @@ returns boolean
 language sql
 stable
 as $$
-  select coalesce(auth.jwt() -> 'user_metadata' ->> 'modhaus_owner_token', '') <> ''
+  select
+    coalesce(auth.jwt() -> 'user_metadata' ->> 'modhaus_owner_token', '') <> ''
+    or lower(coalesce(auth.jwt() ->> 'email', '')) in ('toanlam01@gmail.com', 'modhausllc@gmail.com')
 $$;
 
 create table if not exists public.products (
