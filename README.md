@@ -63,7 +63,9 @@ The chatbot submits to the Netlify Form named `modhaus-chat`. Add a Netlify form
 
 `NEXT_PUBLIC_TEXT_NUMBER` is the public click-to-text number shown to shoppers. `TWILIO_FROM_NUMBER` is only the Twilio-owned sender used for server-side SMS notifications.
 
-When Twilio environment variables are present, each valid chatbot lead also sends an SMS alert from the Twilio number to the owner number. Prefer `TWILIO_API_KEY_SID` and `TWILIO_API_KEY_SECRET` over the main Auth Token. Keep all Twilio secrets out of Git and rotate them if they are ever pasted into chat.
+The no-payment contact flow uses `sms:` links. After the chatbot stores the Netlify form lead, the browser opens the shopper's SMS app with a prefilled message addressed to `NEXT_PUBLIC_TEXT_NUMBER`.
+
+When Twilio environment variables are present, `/api/chat-lead` can also send an SMS alert from the Twilio number to the owner number. Prefer `TWILIO_API_KEY_SID` and `TWILIO_API_KEY_SECRET` over the main Auth Token. Keep all Twilio secrets out of Git and rotate them if they are ever pasted into chat.
 
 Set the Twilio number inbound messaging webhook to:
 

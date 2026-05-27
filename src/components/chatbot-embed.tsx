@@ -3,6 +3,7 @@
 import Script from 'next/script'
 import { MessageCircle, Send, X } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
+import { textHref } from '@/lib/business'
 
 type ChatState = 'idle' | 'sending' | 'sent'
 
@@ -51,19 +52,8 @@ export function ChatbotEmbed() {
         throw new Error('Message failed to send.')
       }
 
-      await fetch('/api/chat-lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          botField: '',
-          phone,
-          email,
-          message,
-          source: window.location.href,
-        }),
-      }).catch(() => undefined)
-
       setState('sent')
+      window.location.href = textHref(`Hi ModHaus, ${message}\n\nMy phone: ${phone}\nMy email: ${email}`)
     } catch {
       setState('idle')
       setError('Could not send the message. Please text instead.')
