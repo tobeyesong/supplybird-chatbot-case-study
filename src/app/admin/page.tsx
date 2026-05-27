@@ -2,17 +2,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Edit, Plus } from 'lucide-react'
 import { logout } from '@/app/admin/actions'
-import { deleteProduct } from '@/app/admin/products/actions'
+import { deleteProduct, updateCategoryPricing } from '@/app/admin/products/actions'
 import { DeleteProductForm } from '@/components/delete-product-form'
-import { normalizeProduct } from '@/lib/catalog'
+import { getCategorySettings, normalizeProduct } from '@/lib/catalog'
 import { fallbackProducts } from '@/lib/catalog-data'
-import { formatCoverage, formatPrice } from '@/lib/format'
+import { formatCoverage, formatPrice, formatUnitPrice } from '@/lib/format'
 import { requireOwner } from '@/lib/supabase/auth'
 
 export const dynamic = 'force-dynamic'
 
 type PageProps = {
-  searchParams: Promise<{ created?: string; updated?: string; deleted?: string; error?: string }>
+  searchParams: Promise<{ created?: string; updated?: string; deleted?: string; pricing?: string; error?: string }>
 }
 
 export default async function AdminPage({ searchParams }: PageProps) {
@@ -26,6 +26,9 @@ export default async function AdminPage({ searchParams }: PageProps) {
         .order('created_at', { ascending: false })
         .then(({ data, error }) => ({ products: data?.map(normalizeProduct) ?? [], error }))
     : { products: fallbackProducts, error: null }
+  const categorySettings = await getCategorySettings()
+  const flooringSetting = categorySettings.find((setting) => setting.category === 'flooring')
+  const roofingSetting = categorySettings.find((setting) => setting.category === 'roofing')
 
   return (
     <section className="section-y">
@@ -49,7 +52,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
           </div>
         </div>
 
-        {params.created || params.updated || params.deleted ? (
+        {params.created || params.updated || params.deleted || params.pricing ? (
           <div className="mt-8 rounded-lg bg-success-soft p-4 text-sm font-semibold text-success">Inventory saved.</div>
         ) : null}
         {!supabase ? (
@@ -60,6 +63,40 @@ export default async function AdminPage({ searchParams }: PageProps) {
         {params.error || error ? (
           <div className="mt-8 rounded-lg bg-danger-soft p-4 text-sm font-semibold text-danger">{params.error || error?.message}</div>
         ) : null}
+
+        <div className="mt-8 surface-card p-6">
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-start">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">Default pricing</p>
+              <h2 className="mt-2 text-2xl font-black tracking-normal">Category starting prices</h2>
+              <p className="mt-2 max-w-2xl text-muted">
+                These values control the public “starting at” prices for Flooring and Roofing.
+              </p>
+            </div>
+            <div className="grid gap-2 text-sm text-muted">
+              <p>
+                Flooring: <span className="font-bold text-foreground">{formatUnitPrice(flooringSetting?.default_price ?? 0.99, 'sq_ft')}</span>
+              </p>
+              <p>
+                Roofing: <span className="font-bold text-foreground">{formatUnitPrice(roofingSetting?.default_price ?? 0, 'sq_ft')}</span>
+              </p>
+            </div>
+          </div>
+
+          <form action={updateCategoryPricing} className="mt-6 grid gap-5 md:grid-cols-[1fr_1fr_auto] md:items-end">
+            <label className="grid gap-2 text-sm font-semibold">
+              Flooring price per sq.ft.
+              <input className="field" name="flooring_default_price" type="number" step="0.01" min="0" defaultValue={flooringSetting?.default_price ?? 0.99} />
+            </label>
+            <label className="grid gap-2 text-sm font-semibold">
+              Roofing price per sq.ft.
+              <input className="field" name="roofing_default_price" type="number" step="0.01" min="0" defaultValue={roofingSetting?.default_price ?? 0} />
+            </label>
+            <button className="min-h-11 rounded-lg bg-foreground px-5 py-2.5 text-sm font-bold text-background hover:bg-foreground/88" type="submit">
+              Save pricing
+            </button>
+          </form>
+        </div>
 
         <div className="mt-8 overflow-hidden rounded-lg bg-surface shadow-card">
           <div className="hidden grid-cols-[1fr_140px_160px_128px] gap-4 border-b border-border px-5 py-3 text-sm font-bold text-muted md:grid">

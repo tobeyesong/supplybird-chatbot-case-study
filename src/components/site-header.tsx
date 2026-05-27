@@ -2,10 +2,18 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown, Menu, MessageCircle, Phone, X } from 'lucide-react'
+import { ChevronDown, Hammer, Layers, Menu, MessageCircle, Package, Phone, Warehouse, X } from 'lucide-react'
 import { useState } from 'react'
 import { business, phoneHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
+import type { ProductCategory } from '@/lib/types'
+
+const categoryIcons = {
+  flooring: Layers,
+  decking: Warehouse,
+  roofing: Hammer,
+  other: Package,
+} satisfies Record<ProductCategory, typeof Layers>
 
 function openChatbot() {
   window.dispatchEvent(new Event('modhaus:open-chat'))
@@ -52,10 +60,20 @@ export function SiteHeader() {
                   <Link
                     key={category.slug}
                     href={`/shop/${category.slug}`}
-                    className="rounded-md px-3 py-2.5 text-sm hover:bg-surface-warm"
+                    className="flex items-start gap-3 rounded-md px-3 py-2.5 text-sm hover:bg-surface-warm"
                   >
-                    <span className="block font-semibold text-foreground">{category.name}</span>
-                    <span className="block text-muted">{category.startingPrice}</span>
+                    {(() => {
+                      const Icon = categoryIcons[category.slug]
+                      return (
+                        <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-dark">
+                          <Icon className="size-4" aria-hidden="true" />
+                        </span>
+                      )
+                    })()}
+                    <span>
+                      <span className="block font-semibold text-foreground">{category.name}</span>
+                      <span className="block text-muted">{category.startingPrice}</span>
+                    </span>
                   </Link>
                 ))}
               </div>
@@ -105,9 +123,13 @@ export function SiteHeader() {
               <Link
                 key={category.slug}
                 href={`/shop/${category.slug}`}
-                className="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-surface-warm"
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold hover:bg-surface-warm"
                 onClick={() => setMobileOpen(false)}
               >
+                {(() => {
+                  const Icon = categoryIcons[category.slug]
+                  return <Icon className="size-4 text-brand" aria-hidden="true" />
+                })()}
                 {category.name}
               </Link>
             ))}

@@ -10,14 +10,18 @@ const priceUnits: Record<string, string> = {
   unit: 'unit',
 }
 
-export function formatPrice(product: Pick<Product, 'price' | 'price_unit'>) {
+export function formatUnitPrice(price: number, priceUnit: string) {
   const amount = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: product.price % 1 === 0 ? 0 : 2,
-  }).format(product.price)
+    maximumFractionDigits: price % 1 === 0 ? 0 : 2,
+  }).format(price)
 
-  return `${amount} / ${priceUnits[product.price_unit] ?? product.price_unit.replaceAll('_', ' ')}`
+  return `${amount} / ${priceUnits[priceUnit] ?? priceUnit.replaceAll('_', ' ')}`
+}
+
+export function formatPrice(product: Pick<Product, 'price' | 'price_unit'>) {
+  return formatUnitPrice(product.price, product.price_unit)
 }
 
 export function formatCoverage(product: Pick<Product, 'coverage_per_box' | 'coverage_unit'>) {

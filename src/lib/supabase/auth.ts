@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
+import { hasOwnerAccess } from '@/lib/supabase/owner-access'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 const demoAdminCookie = 'modhaus_demo_admin'
@@ -63,6 +64,10 @@ export async function requireOwner() {
 
   if (!user) {
     redirect('/admin/login')
+  }
+
+  if (!hasOwnerAccess(user)) {
+    redirect('/admin/login?error=This%20account%20does%20not%20have%20owner%20access.')
   }
 
   return { supabase, user }

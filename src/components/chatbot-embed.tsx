@@ -3,13 +3,15 @@
 import Script from 'next/script'
 import { MessageCircle, Send, X } from 'lucide-react'
 import { FormEvent, useEffect, useState } from 'react'
+import { business } from '@/lib/business'
 
-type ChatState = 'idle' | 'sent'
+type ChatState = 'idle' | 'sending' | 'sent'
 
 export function ChatbotEmbed() {
   const scriptSrc = process.env.NEXT_PUBLIC_CHATBOT_EMBED_SRC
   const [open, setOpen] = useState(false)
   const [state, setState] = useState<ChatState>('idle')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const handler = () => setOpen(true)
@@ -21,15 +23,40 @@ export function ChatbotEmbed() {
     return <Script src={scriptSrc} strategy="afterInteractive" />
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError(null)
+    setState('sending')
+
     const formData = new FormData(event.currentTarget)
     const phone = String(formData.get('phone') || '').trim()
     const email = String(formData.get('email') || '').trim()
     const message = String(formData.get('message') || '').trim()
+    const body = new URLSearchParams({
+      'form-name': 'modhaus-chat',
+      'bot-field': '',
+      phone,
+      email,
+      message,
+      source: window.location.href,
+    })
 
-    console.info('ModHaus chat message', { phone, email, message })
-    setState('sent')
+    try {
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      })
+
+      if (!response.ok) {
+        throw new Error('Message failed to send.')
+      }
+
+      setState('sent')
+    } catch {
+      setState('idle')
+      setError('Could not send the message. Please call instead.')
+    }
   }
 
   return (
@@ -78,9 +105,10 @@ export function ChatbotEmbed() {
               </div>
             ) : (
               <form className="grid gap-4 p-5" onSubmit={handleSubmit}>
+                {error ? <div className="rounded-lg bg-danger-soft p-4 text-sm font-semibold text-danger">{error}</div> : null}
                 <label className="grid gap-2 text-base font-semibold sm:text-sm">
                   Phone number
-                  <input className="field" name="phone" type="tel" placeholder="(714) 555-0138" required />
+                  <input className="field" name="phone" type="tel" placeholder={business.phoneDisplay} required />
                 </label>
                 <label className="grid gap-2 text-base font-semibold sm:text-sm">
                   Email
@@ -92,9 +120,10 @@ export function ChatbotEmbed() {
                 </label>
                 <button
                   type="submit"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-bold text-white hover:bg-brand-dark sm:text-sm"
+                  disabled={state === 'sending'}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-base font-bold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
-                  Send message
+                  {state === 'sending' ? 'Sending...' : 'Send message'}
                   <Send className="size-4" aria-hidden="true" />
                 </button>
               </form>

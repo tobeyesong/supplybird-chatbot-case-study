@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
-import { categories } from '@/lib/catalog-data'
-import { getCategory, getProducts, isProductCategory } from '@/lib/catalog'
+import { getCategoriesWithSettings, getCategoryWithSettings, getProducts, isProductCategory } from '@/lib/catalog'
 
 export const revalidate = 60
 
@@ -13,7 +12,7 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category: categorySlug } = await params
-  const category = getCategory(categorySlug)
+  const category = await getCategoryWithSettings(categorySlug)
 
   if (!category) {
     return { title: 'Shop' }
@@ -32,9 +31,10 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound()
   }
 
-  const category = getCategory(categorySlug)
+  const category = await getCategoryWithSettings(categorySlug)
   if (!category) notFound()
 
+  const categories = await getCategoriesWithSettings()
   const products = await getProducts({ category: categorySlug })
 
   return (

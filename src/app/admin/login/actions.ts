@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { demoAdminCredentials, isDemoAdminEnabled, setDemoAdminSession } from '@/lib/supabase/auth'
+import { hasOwnerAccess } from '@/lib/supabase/owner-access'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 function errorRedirect(message: string): never {
@@ -32,10 +33,15 @@ export async function login(formData: FormData) {
     errorRedirect('Invalid demo admin credentials.')
   }
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     errorRedirect(error.message)
+  }
+
+  if (!hasOwnerAccess(data.user)) {
+    await supabase.auth.signOut()
+    errorRedirect('This account does not have owner access.')
   }
 
   revalidatePath('/', 'layout')

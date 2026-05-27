@@ -1,5 +1,13 @@
 create extension if not exists "pgcrypto";
 
+create or replace function public.is_modhaus_owner()
+returns boolean
+language sql
+stable
+as $$
+  select coalesce(auth.jwt() -> 'user_metadata' ->> 'modhaus_owner_token', '') <> ''
+$$;
+
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -32,20 +40,56 @@ drop policy if exists "Authenticated owner can insert products" on public.produc
 create policy "Authenticated owner can insert products"
 on public.products for insert
 to authenticated
-with check (true);
+with check (public.is_modhaus_owner());
 
 drop policy if exists "Authenticated owner can update products" on public.products;
 create policy "Authenticated owner can update products"
 on public.products for update
 to authenticated
-using (true)
-with check (true);
+using (public.is_modhaus_owner())
+with check (public.is_modhaus_owner());
 
 drop policy if exists "Authenticated owner can delete products" on public.products;
 create policy "Authenticated owner can delete products"
 on public.products for delete
 to authenticated
+using (public.is_modhaus_owner());
+
+create table if not exists public.category_settings (
+  category text primary key check (category in ('flooring', 'decking', 'roofing', 'other')),
+  default_price numeric(10, 2) not null default 0,
+  price_unit text not null default 'sq_ft',
+  updated_at timestamptz not null default now()
+);
+
+alter table public.category_settings enable row level security;
+
+drop policy if exists "Category settings are public readable" on public.category_settings;
+create policy "Category settings are public readable"
+on public.category_settings for select
+to anon, authenticated
 using (true);
+
+drop policy if exists "Authenticated owner can insert category settings" on public.category_settings;
+create policy "Authenticated owner can insert category settings"
+on public.category_settings for insert
+to authenticated
+with check (public.is_modhaus_owner());
+
+drop policy if exists "Authenticated owner can update category settings" on public.category_settings;
+create policy "Authenticated owner can update category settings"
+on public.category_settings for update
+to authenticated
+using (public.is_modhaus_owner())
+with check (public.is_modhaus_owner());
+
+insert into public.category_settings (category, default_price, price_unit)
+values
+  ('flooring', 0.99, 'sq_ft'),
+  ('decking', 1.40, 'ln_ft'),
+  ('roofing', 22.99, 'bundle'),
+  ('other', 36.00, 'roll')
+on conflict (category) do nothing;
 
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
@@ -61,17 +105,17 @@ drop policy if exists "Authenticated owner can upload product images" on storage
 create policy "Authenticated owner can upload product images"
 on storage.objects for insert
 to authenticated
-with check (bucket_id = 'product-images');
+with check (bucket_id = 'product-images' and public.is_modhaus_owner());
 
 drop policy if exists "Authenticated owner can update product images" on storage.objects;
 create policy "Authenticated owner can update product images"
 on storage.objects for update
 to authenticated
-using (bucket_id = 'product-images')
-with check (bucket_id = 'product-images');
+using (bucket_id = 'product-images' and public.is_modhaus_owner())
+with check (bucket_id = 'product-images' and public.is_modhaus_owner());
 
 drop policy if exists "Authenticated owner can delete product images" on storage.objects;
 create policy "Authenticated owner can delete product images"
 on storage.objects for delete
 to authenticated
-using (bucket_id = 'product-images');
+using (bucket_id = 'product-images' and public.is_modhaus_owner());

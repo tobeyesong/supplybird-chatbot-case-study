@@ -2,7 +2,8 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { categories, fallbackProducts } from '@/lib/catalog-data'
 import type { Database } from '@/lib/database.types'
 import { getSupabaseConfig } from '@/lib/supabase/config'
-import type { Product, ProductCategory } from '@/lib/types'
+import { formatUnitPrice } from '@/lib/format'
+import type { CategorySetting, Product, ProductCategory } from '@/lib/types'
 
 let publicSupabaseClient: SupabaseClient<Database> | null = null
 
@@ -21,6 +22,67 @@ export function isProductCategory(value: string): value is ProductCategory {
 
 export function getCategory(slug: string) {
   return categories.find((category) => category.slug === slug) ?? null
+}
+
+function normalizeCategorySetting(setting: Database['public']['Tables']['category_settings']['Row']): CategorySetting | null {
+  if (!isProductCategory(setting.category)) return null
+
+  return {
+    category: setting.category,
+    default_price: Number(setting.default_price),
+    price_unit: setting.price_unit,
+    updated_at: setting.updated_at,
+  }
+}
+
+function fallbackCategorySettings(): CategorySetting[] {
+  return categories.map((category) => ({
+    category: category.slug,
+    default_price: category.default_price,
+    price_unit: category.price_unit,
+    updated_at: null,
+  }))
+}
+
+export async function getCategorySettings() {
+  const supabase = getPublicSupabaseClient()
+
+  if (!supabase) {
+    return fallbackCategorySettings()
+  }
+
+  const { data, error } = await supabase.from('category_settings').select('*')
+
+  if (error || !data) {
+    return fallbackCategorySettings()
+  }
+
+  const settings = data.map(normalizeCategorySetting).filter((setting): setting is CategorySetting => Boolean(setting))
+  const byCategory = new Map(settings.map((setting) => [setting.category, setting]))
+
+  return fallbackCategorySettings().map((fallback) => byCategory.get(fallback.category) ?? fallback)
+}
+
+export async function getCategoriesWithSettings() {
+  const settings = await getCategorySettings()
+  const byCategory = new Map(settings.map((setting) => [setting.category, setting]))
+
+  return categories.map((category) => {
+    const setting = byCategory.get(category.slug)
+    if (!setting) return category
+
+    return {
+      ...category,
+      default_price: setting.default_price,
+      price_unit: setting.price_unit,
+      startingPrice: formatUnitPrice(setting.default_price, setting.price_unit),
+    }
+  })
+}
+
+export async function getCategoryWithSettings(slug: string) {
+  const categoriesWithSettings = await getCategoriesWithSettings()
+  return categoriesWithSettings.find((category) => category.slug === slug) ?? null
 }
 
 export function normalizeProduct(product: Database['public']['Tables']['products']['Row']): Product {

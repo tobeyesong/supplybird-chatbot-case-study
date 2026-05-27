@@ -52,6 +52,26 @@ export type Database = {
         }
         Relationships: []
       }
+      category_settings: {
+        Row: {
+          category: string
+          default_price: number
+          price_unit: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          default_price?: number
+          price_unit?: string
+          updated_at?: string | null
+        }
+        Update: {
+          default_price?: number
+          price_unit?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

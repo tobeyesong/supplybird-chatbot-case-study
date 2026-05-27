@@ -1,16 +1,24 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Clock, MapPin, Phone } from 'lucide-react'
+import { ArrowRight, Clock, Hammer, Layers, MapPin, Package, Phone, Warehouse } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { ProductCard } from '@/components/product-card'
 import { business, phoneHref } from '@/lib/business'
-import { categories } from '@/lib/catalog-data'
-import { getProducts } from '@/lib/catalog'
+import { getCategoriesWithSettings, getProducts } from '@/lib/catalog'
+import type { ProductCategory } from '@/lib/types'
+
+const categoryIcons = {
+  flooring: Layers,
+  decking: Warehouse,
+  roofing: Hammer,
+  other: Package,
+} satisfies Record<ProductCategory, typeof Layers>
 
 export const revalidate = 60
 
 export default async function HomePage() {
   const featuredProducts = await getProducts({ featured: true, limit: 4 })
+  const categories = await getCategoriesWithSettings()
 
   return (
     <>
@@ -62,29 +70,33 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:mt-10 md:grid-cols-4">
+          <div className="mt-10 grid gap-4 lg:grid-cols-6 lg:grid-rows-2">
             {categories.map((category, index) => (
-              <Link
-                key={category.slug}
-                href={`/shop/${category.slug}`}
-                className={`group relative min-h-56 overflow-hidden rounded-lg bg-foreground p-5 text-background shadow-card sm:min-h-72 ${
-                  index === 0 ? 'md:col-span-2 md:row-span-2 md:min-h-[36rem]' : ''
-                }`}
-              >
-                <Image
-                  src={category.image}
-                  alt=""
-                  fill
-                  sizes={index === 0 ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 25vw, 100vw'}
-                  className="object-cover opacity-58 transition duration-300 group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_26_26/0.12),rgb(26_26_26/0.84))]" />
-                <div className="relative flex h-full flex-col justify-end">
-                  <p className="font-mono text-sm font-bold text-brand-soft">{category.startingPrice}</p>
-                  <h3 className="mt-2 text-2xl font-black text-white">{category.name}</h3>
-                  <p className="mt-2 max-w-sm text-base leading-7 text-background/74 sm:text-sm sm:leading-6">{category.description}</p>
-                </div>
-              </Link>
+              <div key={category.slug} className={`flex p-px ${index === 0 || index === 3 ? 'lg:col-span-4' : 'lg:col-span-2'}`}>
+                <Link className="group w-full overflow-hidden rounded-lg bg-surface shadow-card outline outline-1 outline-border/60" href={`/shop/${category.slug}`}>
+                  <div className="relative h-52 overflow-hidden bg-foreground sm:h-64">
+                    <Image
+                      src={category.image}
+                      alt=""
+                      fill
+                      sizes={index === 0 || index === 3 ? '(min-width: 1024px) 66vw, 100vw' : '(min-width: 1024px) 33vw, 100vw'}
+                      className="object-cover opacity-72 transition duration-300 group-hover:scale-[1.03]"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_26_26/0.04),rgb(26_26_26/0.76))]" />
+                    <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-background px-3 py-1.5 text-sm font-bold text-foreground shadow-card">
+                      {(() => {
+                        const Icon = categoryIcons[category.slug]
+                        return <Icon className="size-4 text-brand" aria-hidden="true" />
+                      })()}
+                      {category.startingPrice}
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-2xl font-black tracking-normal">{category.name}</h3>
+                    <p className="mt-2 text-base leading-7 text-muted sm:text-sm sm:leading-6">{category.description}</p>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         </div>

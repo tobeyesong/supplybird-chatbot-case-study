@@ -6,7 +6,7 @@ import { demoAdminCredentials, getCurrentUser, isDemoAdminEnabled } from '@/lib/
 export const dynamic = 'force-dynamic'
 
 type PageProps = {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ created?: string; error?: string }>
 }
 
 export default async function AdminLoginPage({ searchParams }: PageProps) {
@@ -30,6 +30,11 @@ export default async function AdminLoginPage({ searchParams }: PageProps) {
           </div>
 
           {params.error ? <div className="mt-6 rounded-lg bg-danger-soft p-4 text-sm font-semibold text-danger">{params.error}</div> : null}
+          {params.created ? (
+            <div className="mt-6 rounded-lg bg-success-soft p-4 text-sm font-semibold text-success">
+              Owner account created. If Supabase sent a confirmation email, confirm it first, then log in here.
+            </div>
+          ) : null}
           {isDemoAdminEnabled() ? (
             <div className="mt-6 rounded-lg bg-surface-warm p-4 text-sm text-muted">
               <p className="font-bold text-foreground">Local demo admin</p>

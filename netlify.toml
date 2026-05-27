@@ -3,5 +3,4 @@
   publish = ".next"
 
 [build.environment]
-  NEXT_PUBLIC_PHONE_NUMBER = "+17145550138"
-
+  NEXT_PUBLIC_PHONE_NUMBER = "+19499430957"

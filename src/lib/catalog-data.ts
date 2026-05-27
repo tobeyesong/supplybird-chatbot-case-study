@@ -7,6 +7,8 @@ export const categories: Category[] = [
     description: 'Vinyl, laminate, engineered hardwood, underlayment, and closeout lots.',
     image: '/supplybird-assets/flooring.png',
     startingPrice: '$0.99 / sq.ft.',
+    default_price: 0.99,
+    price_unit: 'sq_ft',
     subcategories: ['Vinyl', 'Laminate', 'Engineered hardwood', 'Underlayment'],
   },
   {
@@ -15,6 +17,8 @@ export const categories: Category[] = [
     description: 'Composite deck boards, fascia, skirting, and porch materials.',
     image: '/supplybird-assets/decking.png',
     startingPrice: '$1.40 / ln.ft.',
+    default_price: 1.4,
+    price_unit: 'ln_ft',
     subcategories: ['Composite boards', 'Fascia', 'Skirting'],
   },
   {
@@ -23,6 +27,8 @@ export const categories: Category[] = [
     description: 'Architectural shingles and repair-friendly bundle inventory.',
     image: '/supplybird-assets/roofing.png',
     startingPrice: '$22.99 / bundle',
+    default_price: 22.99,
+    price_unit: 'bundle',
     subcategories: ['Shingles', 'Bundles', 'Repair lots'],
   },
   {
@@ -31,6 +37,8 @@ export const categories: Category[] = [
     description: 'Windows, appliances, underlayment, and job-site supply deals.',
     image: '/supplybird-assets/appliances-supplies.png',
     startingPrice: '$36 / roll',
+    default_price: 36,
+    price_unit: 'roll',
     subcategories: ['Windows', 'Appliances', 'Supplies'],
   },
 ]

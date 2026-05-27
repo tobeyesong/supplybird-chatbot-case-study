@@ -23,5 +23,14 @@ export type Category = {
   description: string
   image: string
   startingPrice: string
+  default_price: number
+  price_unit: string
   subcategories: string[]
+}
+
+export type CategorySetting = {
+  category: ProductCategory
+  default_price: number
+  price_unit: string
+  updated_at: string | null
 }
