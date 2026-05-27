@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Edit, Plus } from 'lucide-react'
 import { logout } from '@/app/admin/actions'
 import { deleteProduct, updateCategoryPricing } from '@/app/admin/products/actions'
+import { AdminToasts, type AdminToastMessage } from '@/components/admin-toasts'
 import { DeleteProductForm } from '@/components/delete-product-form'
 import { getCategorySettings, normalizeProduct } from '@/lib/catalog'
 import { fallbackProducts } from '@/lib/catalog-data'
@@ -15,9 +16,59 @@ type PageProps = {
   searchParams: Promise<{ created?: string; updated?: string; deleted?: string; pricing?: string; error?: string }>
 }
 
+function getAdminToast(params: Awaited<PageProps['searchParams']>): AdminToastMessage | null {
+  if (params.created) {
+    return {
+      id: 'created',
+      tone: 'success',
+      title: 'Product created',
+      message: 'The new product is live in the admin inventory.',
+    }
+  }
+
+  if (params.updated) {
+    return {
+      id: 'updated',
+      tone: 'info',
+      title: 'Product updated',
+      message: 'The listing changes were saved.',
+    }
+  }
+
+  if (params.deleted) {
+    return {
+      id: 'deleted',
+      tone: 'danger',
+      title: 'Deletion confirmed',
+      message: 'The product was removed from the catalog.',
+    }
+  }
+
+  if (params.pricing) {
+    return {
+      id: 'pricing',
+      tone: 'success',
+      title: 'Pricing saved',
+      message: 'Default category pricing was updated.',
+    }
+  }
+
+  if (params.error) {
+    return {
+      id: 'error',
+      tone: 'error',
+      title: 'Could not save changes',
+      message: params.error,
+    }
+  }
+
+  return null
+}
+
 export default async function AdminPage({ searchParams }: PageProps) {
   const { supabase, user } = await requireOwner()
   const params = await searchParams
+  const toast = getAdminToast(params)
 
   const { products, error } = supabase
     ? await supabase
@@ -32,6 +83,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
   return (
     <section className="section-y">
+      <AdminToasts toast={toast} />
       <div className="page-container">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
@@ -52,9 +104,6 @@ export default async function AdminPage({ searchParams }: PageProps) {
           </div>
         </div>
 
-        {params.created || params.updated || params.deleted || params.pricing ? (
-          <div className="mt-8 rounded-lg bg-success-soft p-4 text-sm font-semibold text-success">Inventory saved.</div>
-        ) : null}
         {!supabase ? (
           <div className="mt-8 rounded-lg bg-warning-soft p-4 text-sm font-semibold text-warning">
             Local demo mode is read-only. Connect Supabase to save inventory changes.
