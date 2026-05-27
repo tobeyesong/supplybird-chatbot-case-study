@@ -32,6 +32,13 @@ export function isOwnerSignupConfigured() {
   return Boolean(getOwnerInviteCode() && getOwnerAccessSecret())
 }
 
+export function getAdminAllowedEmails() {
+  return (process.env.ADMIN_ALLOWED_EMAILS || '')
+    .split(',')
+    .map((email) => normalizeEmail(email))
+    .filter(Boolean)
+}
+
 export function verifyOwnerInviteCode(code: string) {
   const inviteCode = getOwnerInviteCode()
 
@@ -50,6 +57,10 @@ export function createOwnerAccessToken(email: string) {
 
 export function hasOwnerAccess(user: OwnerAccessUser | null) {
   if (!user?.email) return false
+
+  if (getAdminAllowedEmails().includes(normalizeEmail(user.email))) {
+    return true
+  }
 
   const expectedToken = createOwnerAccessToken(user.email)
   const actualToken = user.user_metadata?.[ownerTokenMetadataKey]

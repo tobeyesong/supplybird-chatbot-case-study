@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Clock, Hammer, Layers, MapPin, Package, Phone, Warehouse } from 'lucide-react'
+import { ArrowRight, Clock, Hammer, Layers, MapPin, MessageSquare, Package, Phone, Warehouse } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { ProductCard } from '@/components/product-card'
-import { business, phoneHref } from '@/lib/business'
+import { business, phoneHref, textHref } from '@/lib/business'
 import { getCategoriesWithSettings, getProducts } from '@/lib/catalog'
 import type { ProductCategory } from '@/lib/types'
 
@@ -129,13 +129,13 @@ export default async function HomePage() {
             <p className="text-sm font-bold uppercase tracking-wide text-brand-soft">Need an estimate?</p>
             <h2 className="mt-4 text-3xl font-black tracking-normal text-white md:text-5xl">Send the room size or product name and get a stock check.</h2>
             <p className="mt-5 max-w-2xl text-background/74">
-              ModHaus handles purchases in person. Use chat or phone to confirm price, availability, and pickup timing.
+              ModHaus handles purchases in person. Use chat or text to confirm price, availability, and pickup timing.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ChatOpenButton label="Chat" />
-              <a href={phoneHref()} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-background/12 px-5 py-3 text-base font-bold text-background hover:bg-background/18 sm:w-auto sm:text-sm">
-                <Phone className="size-4" aria-hidden="true" />
-                Call
+              <a href={textHref()} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-background/12 px-5 py-3 text-base font-bold text-background hover:bg-background/18 sm:w-auto sm:text-sm">
+                <MessageSquare className="size-4" aria-hidden="true" />
+                Text
               </a>
             </div>
           </div>

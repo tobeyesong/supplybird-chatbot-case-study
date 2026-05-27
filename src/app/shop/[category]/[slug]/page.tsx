@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Phone } from 'lucide-react'
+import { ArrowLeft, MessageSquare } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { CoverageCalculator } from '@/components/coverage-calculator'
 import { ProductCard } from '@/components/product-card'
-import { phoneHref } from '@/lib/business'
+import { textHref } from '@/lib/business'
 import { formatCoverage, formatPrice } from '@/lib/format'
 import { getProduct, getRelatedProducts, isProductCategory } from '@/lib/catalog'
 
@@ -100,16 +100,16 @@ export default async function ProductPage({ params }: PageProps) {
                 <p className="mt-6 font-mono text-2xl font-black text-foreground">{formatPrice(product)}</p>
               </div>
 
-              <CoverageCalculator coveragePerBox={product.coverage_per_box} />
+              <CoverageCalculator coveragePerBox={product.coverage_per_box} price={product.price} priceUnit={product.price_unit} />
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <ChatOpenButton label="Chat" />
                 <a
-                  href={phoneHref()}
+                  href={textHref()}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-bold text-background hover:bg-foreground/88"
                 >
-                  <Phone className="size-4" aria-hidden="true" />
-                  Call
+                  <MessageSquare className="size-4" aria-hidden="true" />
+                  Text
                 </a>
               </div>
             </div>

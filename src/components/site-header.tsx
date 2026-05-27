@@ -2,9 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown, Hammer, Layers, Menu, MessageCircle, Package, Phone, Warehouse, X } from 'lucide-react'
+import { ChevronDown, Hammer, Info, Layers, Menu, MessageCircle, MessageSquare, Package, Phone, Warehouse, X } from 'lucide-react'
 import { useState } from 'react'
-import { business, phoneHref } from '@/lib/business'
+import { business, phoneHref, textHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
 import type { ProductCategory } from '@/lib/types'
 
@@ -95,11 +95,11 @@ export function SiteHeader() {
             Chat
           </button>
           <a
-            href={phoneHref()}
+            href={textHref()}
             className="hidden min-h-11 items-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-bold text-background transition hover:bg-foreground/88 md:inline-flex"
           >
-            <Phone className="size-4" aria-hidden="true" />
-            Call
+            <MessageSquare className="size-4" aria-hidden="true" />
+            Text
           </a>
           <button
             type="button"
@@ -116,9 +116,6 @@ export function SiteHeader() {
       {mobileOpen ? (
         <div className="border-t border-border bg-background md:hidden">
           <div className="page-container grid gap-2 py-4">
-            <Link href="/" className="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-surface-warm" onClick={() => setMobileOpen(false)}>
-              Home
-            </Link>
             {categories.map((category) => (
               <Link
                 key={category.slug}
@@ -133,7 +130,8 @@ export function SiteHeader() {
                 {category.name}
               </Link>
             ))}
-            <Link href="/about" className="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-surface-warm" onClick={() => setMobileOpen(false)}>
+            <Link href="/about" className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold hover:bg-surface-warm" onClick={() => setMobileOpen(false)}>
+              <Info className="size-4 text-brand" aria-hidden="true" />
               About
             </Link>
           </div>

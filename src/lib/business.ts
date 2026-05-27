@@ -25,3 +25,7 @@ export const business = {
 export function phoneHref() {
   return `tel:${business.phoneNumber}`
 }
+
+export function textHref() {
+  return `sms:${business.phoneNumber}`
+}

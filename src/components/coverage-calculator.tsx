@@ -3,7 +3,35 @@
 import { Calculator } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-export function CoverageCalculator({ coveragePerBox }: { coveragePerBox: number | null }) {
+type CoverageCalculatorProps = {
+  coveragePerBox: number | null
+  price: number
+  priceUnit: string
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+function estimateMaterialPrice(options: { adjustedSqft: number; boxes: number; price: number; priceUnit: string }) {
+  if (options.price <= 0) return null
+
+  if (options.priceUnit === 'sq_ft') {
+    return options.adjustedSqft * options.price
+  }
+
+  if (['box', 'bundle', 'unit'].includes(options.priceUnit)) {
+    return options.boxes * options.price
+  }
+
+  return null
+}
+
+export function CoverageCalculator({ coveragePerBox, price, priceUnit }: CoverageCalculatorProps) {
   const [mode, setMode] = useState<'room' | 'total'>('room')
   const [length, setLength] = useState('')
   const [width, setWidth] = useState('')
@@ -17,13 +45,15 @@ export function CoverageCalculator({ coveragePerBox }: { coveragePerBox: number 
 
     const adjustedSqft = rawSqft * 1.1
     const boxes = Math.ceil(adjustedSqft / coveragePerBox)
+    const estimatedPrice = estimateMaterialPrice({ adjustedSqft, boxes, price, priceUnit })
 
     return {
       boxes,
       adjustedSqft,
       coveredSqft: boxes * coveragePerBox,
+      estimatedPrice,
     }
-  }, [coveragePerBox, length, mode, total, width])
+  }, [coveragePerBox, length, mode, price, priceUnit, total, width])
 
   if (!coveragePerBox) {
     return (
@@ -101,7 +131,14 @@ export function CoverageCalculator({ coveragePerBox }: { coveragePerBox: number 
         {result ? (
           <p className="text-sm leading-6">
             You will need <span className="font-bold text-white">~{result.boxes} boxes</span>, covering about{' '}
-            <span className="font-bold text-white">{Math.round(result.coveredSqft)} sq.ft.</span> including 10% waste. Contact us to confirm availability.
+            <span className="font-bold text-white">{Math.round(result.coveredSqft)} sq.ft.</span> including 10% waste.
+            {result.estimatedPrice ? (
+              <>
+                {' '}
+                Estimated material total: <span className="font-bold text-white">~{formatCurrency(result.estimatedPrice)}</span>.
+              </>
+            ) : null}{' '}
+            Contact us to confirm availability.
           </p>
         ) : (
           <p className="text-sm text-background/72">Enter dimensions to estimate boxes with 10% waste included.</p>

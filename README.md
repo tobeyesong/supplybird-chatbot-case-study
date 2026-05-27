@@ -33,6 +33,7 @@ NEXT_PUBLIC_CHATBOT_EMBED_SRC=
 NEXT_PUBLIC_SITE_URL=
 OWNER_INVITE_CODE=
 OWNER_ACCESS_SECRET=
+ADMIN_ALLOWED_EMAILS=
 ```
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` is also supported if the project still uses legacy anon key naming.
@@ -44,6 +45,8 @@ To let the client create the single owner login, send them:
 ```
 
 After the owner account exists, rotate or remove `OWNER_INVITE_CODE` so the account creation URL cannot be reused. Keep `OWNER_ACCESS_SECRET` unchanged because it validates the existing owner login.
+
+Use `ADMIN_ALLOWED_EMAILS` for explicit creator/admin access, for example `you@example.com,owner@example.com`.
 
 ## Lead Notifications
 

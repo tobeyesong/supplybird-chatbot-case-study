@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { Clock, MapPin, Phone } from 'lucide-react'
+import { Clock, MapPin, MessageSquare, Phone } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
-import { business, phoneHref } from '@/lib/business'
+import { business, textHref } from '@/lib/business'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -23,9 +23,9 @@ export default function AboutPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ChatOpenButton label="Ask about inventory" />
-              <a href={phoneHref()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-bold text-background hover:bg-foreground/88">
-                <Phone className="size-4" aria-hidden="true" />
-                Call {business.phoneDisplay}
+              <a href={textHref()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-sm font-bold text-background hover:bg-foreground/88">
+                <MessageSquare className="size-4" aria-hidden="true" />
+                Text {business.phoneDisplay}
               </a>
             </div>
           </div>
