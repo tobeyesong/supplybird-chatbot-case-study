@@ -45,10 +45,6 @@ export function SiteHeader() {
         </Link>
 
         <div className="hidden items-center gap-7 md:flex">
-          <Link href="/" className="text-sm font-semibold text-foreground/80 hover:text-foreground">
-            Home
-          </Link>
-
           <div className="group relative">
             <button className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground/80 hover:text-foreground">
               Shop
