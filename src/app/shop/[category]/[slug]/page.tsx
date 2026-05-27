@@ -5,7 +5,7 @@ import { ArrowLeft, MessageSquare } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { CoverageCalculator } from '@/components/coverage-calculator'
 import { ProductCard } from '@/components/product-card'
-import { ProductImage } from '@/components/product-image'
+import { ProductGallery } from '@/components/product-gallery'
 import { textHref } from '@/lib/business'
 import { formatCoverage, formatPrice } from '@/lib/format'
 import { getProduct, getRelatedProducts, isProductCategory } from '@/lib/catalog'
@@ -58,24 +58,7 @@ export default async function ProductPage({ params }: PageProps) {
           </Link>
 
           <div className="mt-8 grid gap-10 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="grid gap-4">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface-warm shadow-card">
-                <ProductImage
-                  src={images[0]}
-                  alt={product.title}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              {images.length > 1 ? (
-                <div className="grid grid-cols-4 gap-4">
-                  {images.slice(1, 5).map((image) => (
-                    <div key={image} className="relative aspect-square overflow-hidden rounded-lg bg-surface-warm shadow-card">
-                      <ProductImage src={image} alt="" className="h-full w-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            <ProductGallery images={images} title={product.title} />
 
             <div className="grid content-start gap-6">
               <div>
