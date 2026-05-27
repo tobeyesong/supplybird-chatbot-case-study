@@ -40,7 +40,7 @@ export function SiteHeader() {
           <Image src="/modhaus-mark.svg" alt="" width={44} height={44} className="rounded-lg" priority />
             <span className="min-w-0">
               <span className="block text-base font-bold leading-5 tracking-normal text-foreground">{business.name}</span>
-              <span className="hidden text-sm leading-5 text-muted sm:block">Orange County building supply</span>
+              <span className="hidden text-sm leading-5 text-muted sm:block">Orange County Building Supply</span>
             </span>
         </Link>
 
