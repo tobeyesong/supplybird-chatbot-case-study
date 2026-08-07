@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Clock, Hammer, Layers, MapPin, MessageSquare, Package, Phone, Warehouse } from 'lucide-react'
+import { ArrowRight, BadgePercent, Clock, Hammer, Layers, MapPin, MessageSquare, Package, Phone, Warehouse } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { ProductCard } from '@/components/product-card'
 import { business, phoneHref, textHref } from '@/lib/business'
@@ -22,6 +22,21 @@ export default async function HomePage() {
 
   return (
     <>
+      <aside className="bg-brand text-foreground" aria-label="Grand opening sale">
+        <div className="page-container flex flex-col items-center justify-center gap-2 py-3 text-center sm:flex-row sm:gap-4 sm:text-left">
+          <span className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wide">
+            <BadgePercent className="size-5" aria-hidden="true" />
+            Grand Opening Sale
+          </span>
+          <span className="hidden h-5 w-px bg-foreground/30 sm:block" aria-hidden="true" />
+          <p className="text-sm font-semibold">Over 50% off major retail prices. Save on your projects.</p>
+          <Link href="/shop/flooring" className="inline-flex items-center gap-1 text-sm font-black underline decoration-2 underline-offset-4 hover:no-underline">
+            Shop sale
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </aside>
+
       <section className="relative min-h-[560px] overflow-hidden bg-foreground text-background sm:min-h-[620px]">
         <Image
           src="/supplybird-assets/flooring.png"
@@ -35,7 +50,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(26_26_26/0.92),rgb(26_26_26/0.64),rgb(26_26_26/0.22))]" />
         <div className="page-container relative flex min-h-[560px] items-center py-16 sm:min-h-[620px] sm:py-20">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-wide text-brand-soft">{business.city} closeout materials</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-brand">Grand opening deals in {business.city}</p>
             <h1 className="mt-5 text-4xl font-black leading-[1.04] tracking-normal text-white sm:text-5xl md:text-7xl">
               <span className="block sm:inline">Flooring, decking,</span>{' '}
               <span className="block sm:inline">and building supplies</span>{' '}
