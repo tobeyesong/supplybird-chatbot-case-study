@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Clock3 } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { CategoryEmptyState } from '@/components/empty-state'
 import { ProductCard } from '@/components/product-card'
@@ -61,6 +62,19 @@ export default async function CategoryPage({ params }: PageProps) {
           </div>
           <p className="font-mono text-sm font-bold text-brand-dark">Starting at {category.startingPrice}</p>
         </div>
+
+        {category.slug === 'roofing' ? (
+          <aside className="mt-8 flex items-start gap-4 rounded-lg border border-brand/40 bg-brand-soft p-5 shadow-card sm:items-center sm:p-6" aria-label="Upcoming IKO shingles">
+            <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-foreground">
+              <Clock3 className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-black uppercase tracking-wide text-brand">Coming soon</p>
+              <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">IKO shingles are on the way.</h2>
+              <p className="mt-1 text-sm leading-6 text-muted">Check back soon for available styles, colors, bundle pricing, and pickup details.</p>
+            </div>
+          </aside>
+        ) : null}
 
         {products.length > 0 ? (
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
