@@ -17,8 +17,8 @@ function formatPhoneDisplay(phone: string) {
 export const business = {
   name: 'ModHaus',
   tagline: 'Flooring, decking, roofing, and home supply closeouts.',
-  address: 'Orange County, California',
-  city: 'Orange County, California',
+  address: '1516 E Edinger Ave Ste D, Santa Ana, CA 92705',
+  city: 'Santa Ana, CA 92705',
   hours: 'Open daily, 10:00 AM - 6:00 PM',
   phoneDisplay: formatPhoneDisplay(phoneNumber),
   phoneNumber,
