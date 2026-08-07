@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ModHaus">
   <rect width="64" height="64" rx="16" fill="#1a1a1a"/>
-  <path d="M14 29 32 14l18 15" fill="none" stroke="#ea580c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14 29 32 14l18 15" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M19 48V30l13 11 13-11v18" fill="none" stroke="#fafaf5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M32 41V24" fill="none" stroke="#fafaf5" stroke-width="6" stroke-linecap="round"/>
 </svg>

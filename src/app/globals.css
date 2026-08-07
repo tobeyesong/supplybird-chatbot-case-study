@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafaf5;
-  --foreground: #1a1a1a;
-  --surface: #ffffff;
-  --surface-warm: #f3f0e8;
-  --muted: #6f6a62;
-  --border: #ddd8cc;
-  --brand: #c2410c;
-  --brand-dark: #9a3412;
-  --brand-soft: #ffedd5;
-  --success: #166534;
-  --success-soft: #dcfce7;
+  --background: #eaffef;
+  --foreground: #050805;
+  --surface: #f8fff9;
+  --surface-warm: #d8f5df;
+  --muted: #4e6655;
+  --border: #acd4b7;
+  --brand: #22c55e;
+  --brand-dark: #16a34a;
+  --brand-soft: #173d24;
+  --success: #4ade80;
+  --success-soft: #12351d;
   --warning: #a16207;
   --warning-soft: #fef3c7;
   --danger: #b91c1c;
@@ -36,8 +36,8 @@
   --color-danger-soft: var(--danger-soft);
   --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --shadow-card: 0 1px 2px rgb(26 26 26 / 0.06), 0 8px 24px rgb(26 26 26 / 0.06);
-  --shadow-float: 0 16px 48px rgb(26 26 26 / 0.16);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.2), 0 8px 24px rgb(0 0 0 / 0.28);
+  --shadow-float: 0 16px 48px rgb(0 0 0 / 0.45);
 }
 
 * {
@@ -51,7 +51,9 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 15% 0%, rgb(34 197 94 / 0.22), transparent 30rem),
+    var(--background);
   color: var(--foreground);
 }
 
@@ -97,7 +99,7 @@ textarea {
     width: 100%;
     border-radius: 0.5rem;
     border: 1px solid var(--border);
-    background: #ffffff;
+    background: var(--surface);
     padding: 0.625rem 0.75rem;
     color: var(--foreground);
   }
