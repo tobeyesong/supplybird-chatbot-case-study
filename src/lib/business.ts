@@ -19,7 +19,7 @@ export const business = {
   tagline: 'Flooring, decking, roofing, and home supply closeouts.',
   address: '1516 E Edinger Ave Ste D, Santa Ana, CA 92705',
   city: 'Santa Ana, CA 92705',
-  hours: 'Open daily, 10:00 AM - 6:00 PM',
+  hours: 'By appointment only',
   phoneDisplay: formatPhoneDisplay(phoneNumber),
   phoneNumber,
   textDisplay: formatPhoneDisplay(textNumber),
