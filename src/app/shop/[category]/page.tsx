@@ -86,13 +86,13 @@ export default async function CategoryPage({ params }: PageProps) {
         ) : null}
 
         {category.slug === 'roofing' ? (
-          <aside className="mt-8 flex items-start gap-4 rounded-lg border border-brand/40 bg-brand-soft p-5 shadow-card sm:items-center sm:p-6" aria-label="Upcoming IKO shingles">
+          <aside className="mt-8 flex items-start gap-4 rounded-lg border border-brand/40 bg-brand-soft p-5 shadow-card sm:items-center sm:p-6" aria-label="Upcoming shingles">
             <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-foreground">
               <Clock3 className="size-5" aria-hidden="true" />
             </span>
             <div>
               <p className="text-sm font-black uppercase tracking-wide text-brand">Coming soon</p>
-              <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">IKO shingles are on the way.</h2>
+              <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">Economy shingles coming soon.</h2>
               <p className="mt-1 text-sm leading-6 text-muted">Check back soon for available styles, colors, bundle pricing, and pickup details.</p>
             </div>
           </aside>
