@@ -45,6 +45,26 @@ export const categories: Category[] = [
 
 export const availableProducts: Product[] = [
   {
+    id: 'stainmaster-lockhart-oak-1079323',
+    title: 'Stainmaster Lockhart Oak Waterproof Vinyl Plank',
+    slug: 'stainmaster-lockhart-oak-1079323',
+    description: 'Gray-brown Lockhart Oak waterproof vinyl plank with Pet Protect, item #1079323. Each box includes eight 7.2 in. x 48.03 in. planks with a 7 mm thickness, 20 mil wear layer, and Greenguard Gold certification.',
+    category: 'flooring',
+    subcategory: 'vinyl',
+    price: 1.59,
+    price_unit: 'sq_ft',
+    coverage_per_box: 19.22,
+    coverage_unit: 'sq_ft',
+    images: [
+      '/product-images/stainmaster-lockhart-oak-1079323-1.jpg',
+      '/product-images/stainmaster-lockhart-oak-1079323-2.jpg',
+      '/product-images/stainmaster-lockhart-oak-1079323-3.jpg',
+    ],
+    in_stock: true,
+    featured: true,
+    created_at: '2026-08-14T13:00:00.000Z',
+  },
+  {
     id: 'stainmaster-xl-waterproof-oak-6004585',
     title: 'Stainmaster XL Waterproof Oak Vinyl Plank',
     slug: 'stainmaster-xl-waterproof-oak-6004585',
