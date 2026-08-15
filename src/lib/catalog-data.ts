@@ -45,6 +45,26 @@ export const categories: Category[] = [
 
 export const availableProducts: Product[] = [
   {
+    id: 'mohawk-luxury-vinyl-plank',
+    title: 'Mohawk Luxury Vinyl Plank Flooring',
+    slug: 'mohawk-luxury-vinyl-plank',
+    description: 'Natural oak-look Mohawk luxury vinyl plank flooring with a 5 mm thickness, durable 20 mil wear layer, waterproof construction, and Uniclic locking technology. Each box covers 30.26 sq. ft.',
+    category: 'flooring',
+    subcategory: 'vinyl',
+    price: 1.65,
+    price_unit: 'sq_ft',
+    coverage_per_box: 30.26,
+    coverage_unit: 'sq_ft',
+    images: [
+      '/product-images/mohawk-luxury-vinyl-plank-1.jpg',
+      '/product-images/mohawk-luxury-vinyl-plank-2.jpg',
+      '/product-images/mohawk-luxury-vinyl-plank-3.jpg',
+    ],
+    in_stock: true,
+    featured: true,
+    created_at: '2026-08-14T14:00:00.000Z',
+  },
+  {
     id: 'stainmaster-lockhart-oak-1079323',
     title: 'Stainmaster Lockhart Oak Waterproof Vinyl Plank',
     slug: 'stainmaster-lockhart-oak-1079323',
