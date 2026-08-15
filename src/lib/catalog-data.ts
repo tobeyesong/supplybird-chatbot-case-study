@@ -43,7 +43,7 @@ export const categories: Category[] = [
   },
 ]
 
-export const fallbackProducts: Product[] = [
+export const availableProducts: Product[] = [
   {
     id: 'stainmaster-xl-waterproof-oak-6004585',
     title: 'Stainmaster XL Waterproof Oak Vinyl Plank',
@@ -60,6 +60,10 @@ export const fallbackProducts: Product[] = [
     featured: true,
     created_at: '2026-08-14T12:00:00.000Z',
   },
+]
+
+export const fallbackProducts: Product[] = [
+  ...availableProducts,
   {
     id: 'vinyl-rustic-oak',
     title: 'Rustic Reclaimed Oak Waterproof Vinyl',

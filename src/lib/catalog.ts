@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { categories, fallbackProducts } from '@/lib/catalog-data'
+import { availableProducts, categories, fallbackProducts } from '@/lib/catalog-data'
 import type { Database } from '@/lib/database.types'
 import { getSupabaseConfig } from '@/lib/supabase/config'
 import { formatUnitPrice } from '@/lib/format'
@@ -122,6 +122,20 @@ function fallbackFilter(options: { category?: ProductCategory; featured?: boolea
   return products
 }
 
+function availableFilter(options: { category?: ProductCategory; featured?: boolean; limit?: number } = {}) {
+  let products = availableProducts
+
+  if (options.category) {
+    products = products.filter((product) => product.category === options.category)
+  }
+
+  if (options.featured) {
+    products = products.filter((product) => product.featured)
+  }
+
+  return products
+}
+
 export async function getProducts(options: { category?: ProductCategory; featured?: boolean; limit?: number } = {}) {
   const supabase = getPublicSupabaseClient()
 
@@ -149,7 +163,11 @@ export async function getProducts(options: { category?: ProductCategory; feature
     return fallbackFilter(options)
   }
 
-  return data.map(normalizeProduct)
+  const databaseProducts = data.map(normalizeProduct)
+  const databaseIds = new Set(databaseProducts.map((product) => product.id))
+  const products = [...availableFilter(options).filter((product) => !databaseIds.has(product.id)), ...databaseProducts]
+
+  return options.limit ? products.slice(0, options.limit) : products
 }
 
 export async function getProduct(category: ProductCategory, slug: string) {
@@ -170,7 +188,9 @@ export async function getProduct(category: ProductCategory, slug: string) {
     return fallbackProducts.find((product) => product.category === category && product.slug === slug) ?? null
   }
 
-  return data ? normalizeProduct(data) : null
+  return data
+    ? normalizeProduct(data)
+    : availableProducts.find((product) => product.category === category && product.slug === slug) ?? null
 }
 
 export async function getRelatedProducts(product: Product) {
