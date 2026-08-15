@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Clock3, Tags } from 'lucide-react'
+import { ArrowRight, BadgePercent, Clock3, Tags } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { CategoryEmptyState } from '@/components/empty-state'
 import { ProductCard } from '@/components/product-card'
@@ -64,6 +64,26 @@ export default async function CategoryPage({ params }: PageProps) {
         </div>
 
         {category.slug === 'flooring' ? (
+          <aside className="relative mt-8 overflow-hidden rounded-lg bg-foreground p-6 text-background shadow-float sm:p-8" aria-label="Flooring project sale">
+            <div className="absolute -right-16 -top-20 size-56 rounded-full bg-brand/20 blur-3xl" aria-hidden="true" />
+            <div className="relative flex flex-col justify-between gap-6 md:flex-row md:items-center">
+              <div className="max-w-2xl">
+                <p className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wide text-brand">
+                  <BadgePercent className="size-5" aria-hidden="true" />
+                  Flooring project sale
+                </p>
+                <h2 className="mt-3 text-3xl font-black tracking-normal text-white sm:text-4xl">Save over 50% off major retail prices.</h2>
+                <p className="mt-3 max-w-xl leading-7 text-background/75">Stretch your project budget with closeout flooring from brands including Mohawk and LifeProof. Quantities are limited.</p>
+              </div>
+              <a href="#flooring-inventory" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-black text-foreground shadow-card transition hover:bg-brand-dark hover:text-white">
+                Shop flooring deals
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </a>
+            </div>
+          </aside>
+        ) : null}
+
+        {category.slug === 'flooring' ? (
           <aside className="mt-8 rounded-lg border border-brand/40 bg-brand-soft p-5 shadow-card sm:p-6" aria-label="Featured flooring brands">
             <div className="flex items-start gap-4 sm:items-center">
               <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-foreground">
@@ -99,7 +119,7 @@ export default async function CategoryPage({ params }: PageProps) {
         ) : null}
 
         {products.length > 0 ? (
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+          <div id={category.slug === 'flooring' ? 'flooring-inventory' : undefined} className="mt-10 scroll-mt-36 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
