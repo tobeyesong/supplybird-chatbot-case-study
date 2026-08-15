@@ -45,6 +45,22 @@ export const categories: Category[] = [
 
 export const fallbackProducts: Product[] = [
   {
+    id: 'stainmaster-xl-waterproof-oak-6004585',
+    title: 'Stainmaster XL Waterproof Oak Vinyl Plank',
+    slug: 'stainmaster-xl-waterproof-oak-6004585',
+    description: 'Warm oak-look waterproof vinyl plank, item #6004585. Each box includes five 9.05 in. x 59.75 in. planks with a 7 mm thickness, durable 22 mil wear layer, and Greenguard Gold certification.',
+    category: 'flooring',
+    subcategory: 'vinyl',
+    price: 1.69,
+    price_unit: 'sq_ft',
+    coverage_per_box: 18.78,
+    coverage_unit: 'sq_ft',
+    images: ['/product-images/stainmaster-xl-waterproof-oak-6004585-1.jpg', '/product-images/stainmaster-xl-waterproof-oak-6004585-2.jpg'],
+    in_stock: true,
+    featured: true,
+    created_at: '2026-08-14T12:00:00.000Z',
+  },
+  {
     id: 'vinyl-rustic-oak',
     title: 'Rustic Reclaimed Oak Waterproof Vinyl',
     slug: 'vinyl-rustic-oak',
