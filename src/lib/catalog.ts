@@ -8,6 +8,13 @@ import type { CategorySetting, Product, ProductCategory } from '@/lib/types'
 let publicSupabaseClient: SupabaseClient<Database> | null = null
 const hiddenProductSlugs = new Set(['roofing-charcoal-bundle'])
 
+type GetProductsOptions = {
+  category?: ProductCategory
+  featured?: boolean
+  limit?: number
+  actualOnly?: boolean
+}
+
 function getPublicSupabaseClient() {
   const config = getSupabaseConfig()
   if (!config) return null
@@ -105,7 +112,7 @@ export function normalizeProduct(product: Database['public']['Tables']['products
   }
 }
 
-function fallbackFilter(options: { category?: ProductCategory; featured?: boolean; limit?: number } = {}) {
+function fallbackFilter(options: GetProductsOptions = {}) {
   let products = fallbackProducts
 
   if (options.category) {
@@ -123,7 +130,7 @@ function fallbackFilter(options: { category?: ProductCategory; featured?: boolea
   return products
 }
 
-function availableFilter(options: { category?: ProductCategory; featured?: boolean; limit?: number } = {}) {
+function availableFilter(options: GetProductsOptions = {}) {
   let products = availableProducts
 
   if (options.category) {
@@ -137,11 +144,11 @@ function availableFilter(options: { category?: ProductCategory; featured?: boole
   return products
 }
 
-export async function getProducts(options: { category?: ProductCategory; featured?: boolean; limit?: number } = {}) {
+export async function getProducts(options: GetProductsOptions = {}) {
   const supabase = getPublicSupabaseClient()
 
   if (!supabase) {
-    return fallbackFilter(options)
+    return options.actualOnly ? availableFilter(options) : fallbackFilter(options)
   }
 
   let query = supabase.from('products').select('*').order('created_at', { ascending: false })
@@ -161,7 +168,7 @@ export async function getProducts(options: { category?: ProductCategory; feature
   const { data, error } = await query
 
   if (error || !data) {
-    return fallbackFilter(options)
+    return options.actualOnly ? availableFilter(options) : fallbackFilter(options)
   }
 
   const databaseProducts = data.map(normalizeProduct).filter((product) => !hiddenProductSlugs.has(product.slug))

@@ -17,7 +17,7 @@ const categoryIcons = {
 export const revalidate = 60
 
 export default async function HomePage() {
-  const featuredProducts = await getProducts({ featured: true, limit: 4 })
+  const currentProducts = await getProducts({ actualOnly: true })
   const categories = await getCategoriesWithSettings()
 
   return (
@@ -73,65 +73,37 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section-y bg-background">
-        <div className="page-container">
-          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div className="max-w-2xl">
-              <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">Shop by category</p>
-              <h2 className="mt-3 text-3xl font-black tracking-normal md:text-5xl">Start with the material type.</h2>
-            </div>
-            <p className="max-w-md text-base leading-7 text-muted">
-              Pricing changes with closeout lots, so every category points shoppers toward a quick stock check before they drive in.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-4 lg:grid-cols-6 lg:grid-rows-2">
-            {categories.map((category, index) => (
-              <div key={category.slug} className={`flex p-px ${index === 0 || index === 3 ? 'lg:col-span-4' : 'lg:col-span-2'}`}>
-                <Link className="group w-full overflow-hidden rounded-lg bg-surface shadow-card outline outline-1 outline-border/60" href={`/shop/${category.slug}`}>
-                  <div className="relative h-52 overflow-hidden bg-foreground sm:h-64">
-                    <Image
-                      src={category.image}
-                      alt=""
-                      fill
-                      sizes={index === 0 || index === 3 ? '(min-width: 1024px) 66vw, 100vw' : '(min-width: 1024px) 33vw, 100vw'}
-                      className="object-cover opacity-72 transition duration-300 group-hover:scale-[1.03]"
-                    />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_26_26/0.04),rgb(26_26_26/0.76))]" />
-                    <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-background px-3 py-1.5 text-sm font-bold text-foreground shadow-card">
-                      {(() => {
-                        const Icon = categoryIcons[category.slug]
-                        return <Icon className="size-4 text-brand" aria-hidden="true" />
-                      })()}
-                      {category.startingPrice}
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-2xl font-black tracking-normal">{category.name}</h3>
-                    <p className="mt-2 text-base leading-7 text-muted sm:text-sm sm:leading-6">{category.description}</p>
-                  </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="section-y bg-surface-warm">
         <div className="page-container">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">Featured inventory</p>
-              <h2 className="mt-3 text-3xl font-black tracking-normal md:text-5xl">Current deals worth checking first.</h2>
+            <div className="max-w-2xl">
+              <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">Available now</p>
+              <h2 className="mt-3 text-3xl font-black tracking-normal md:text-5xl">Shop the products we actually have.</h2>
             </div>
-            <Link href="/shop/flooring" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-foreground px-5 py-3 text-base font-bold text-background hover:bg-foreground/88 sm:w-fit sm:text-sm">
-              View catalog
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
+            <p className="max-w-md text-base leading-7 text-muted">
+              These are current ModHaus listings with real product photos. Quantities can move quickly, so message us for a stock check.
+            </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-            {featuredProducts.map((product) => (
+          <nav className="mt-8 flex flex-wrap gap-2" aria-label="Shop by category">
+            {categories.map((category) => {
+              const Icon = categoryIcons[category.slug]
+
+              return (
+                <Link
+                  key={category.slug}
+                  href={`/shop/${category.slug}`}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-bold text-foreground shadow-card transition hover:border-brand hover:text-brand-dark"
+                >
+                  <Icon className="size-4 text-brand" aria-hidden="true" />
+                  {category.name}
+                </Link>
+              )
+            })}
+          </nav>
+
+          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+            {currentProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
