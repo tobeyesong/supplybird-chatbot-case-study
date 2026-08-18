@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Clock, MapPin, Phone } from 'lucide-react'
+import { CardProviderLogos } from '@/components/card-provider-logos'
 import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { business, phoneHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
@@ -18,6 +19,12 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-5 text-sm leading-6 text-background/72">{business.tagline}</p>
+          <div className="mt-5 rounded-lg border border-background/12 bg-background/6 p-4 text-sm">
+            <p className="font-bold text-background">Payment methods</p>
+            <p className="mt-2 text-background/72">{business.paymentMethods.join(' · ')}</p>
+            <CardProviderLogos className="mt-3" />
+            <p className="mt-2 text-xs leading-5 text-brand">{business.paymentNotice}</p>
+          </div>
         </div>
 
         <div>

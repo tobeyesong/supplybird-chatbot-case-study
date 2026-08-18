@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, BadgePercent, Clock, DoorOpen, Hammer, Layers, MapPin, MessageSquare, Package, Phone } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
+import { CardProviderLogos } from '@/components/card-provider-logos'
 import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { ProductCard } from '@/components/product-card'
 import { business, phoneHref, textHref } from '@/lib/business'
@@ -150,8 +151,18 @@ export default async function HomePage() {
             <div className="rounded-lg bg-surface-warm p-5">
               <p className="font-bold">Buying process</p>
               <p className="mt-2 text-base leading-7 text-muted sm:text-sm sm:leading-6">
-                Browse online, confirm stock by message, then arrange pickup and pay in person.
+                Browse online, confirm stock by message, then arrange pickup and pay in person by cash, Zelle, or card.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {business.paymentMethods.map((method) => (
+                  <span key={method} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-black text-foreground">
+                    {method}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-4 text-xs font-black uppercase tracking-wide text-muted">Major cards accepted</p>
+              <CardProviderLogos className="mt-2" />
+              <p className="mt-3 text-xs font-bold leading-5 text-warning">{business.paymentNotice}</p>
             </div>
           </div>
         </div>

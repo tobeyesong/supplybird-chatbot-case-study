@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { CheckCircle2, Clock, MapPin, MessageSquare, PackageSearch, Ruler } from 'lucide-react'
+import { CheckCircle2, Clock, CreditCard, MapPin, MessageSquare, PackageSearch, Ruler } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
+import { CardProviderLogos } from '@/components/card-provider-logos'
 import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { business, textHref } from '@/lib/business'
 
@@ -82,7 +83,7 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-surface-warm py-8 md:py-10">
-        <div className="page-container grid gap-5 md:grid-cols-3">
+        <div className="page-container grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           <div className="surface-card p-5 md:p-6">
             <MapPin className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Location</h2>
@@ -98,6 +99,13 @@ export default function AboutPage() {
             <MessageSquare className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Best way to check stock</h2>
             <p className="mt-2 leading-7 text-muted">Send a product name, photo, or room size through chat or text.</p>
+          </div>
+          <div className="surface-card p-5 md:p-6">
+            <CreditCard className="size-6 text-brand" aria-hidden="true" />
+            <h2 className="mt-5 text-xl font-black">Payment methods</h2>
+            <p className="mt-2 font-bold text-foreground">{business.paymentMethods.join(' · ')}</p>
+            <CardProviderLogos className="mt-4" />
+            <p className="mt-3 text-sm leading-6 text-warning">{business.paymentNotice}</p>
           </div>
         </div>
       </section>
