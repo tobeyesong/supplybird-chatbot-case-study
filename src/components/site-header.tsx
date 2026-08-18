@@ -71,7 +71,7 @@ export function SiteHeader() {
                     })()}
                     <span>
                       <span className="block font-semibold text-foreground">{category.name}</span>
-                      <span className="block text-muted">{category.startingPrice}</span>
+                      <span className="block text-muted">{category.slug === 'roofing' ? 'Coming soon' : category.startingPrice}</span>
                     </span>
                   </Link>
                 ))}

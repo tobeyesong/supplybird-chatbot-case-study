@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, BadgePercent, Megaphone, MessageCircle, Sparkles, Tags } from 'lucide-react'
 import { notFound } from 'next/navigation'
@@ -61,7 +62,9 @@ export default async function CategoryPage({ params }: PageProps) {
             <h1 className="mt-6 text-4xl font-black tracking-normal md:text-6xl">{category.name}</h1>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">{category.description}</p>
           </div>
-          <p className="font-mono text-sm font-bold text-brand-dark">Starting at {category.startingPrice}</p>
+          {category.slug !== 'roofing' ? (
+            <p className="font-mono text-sm font-bold text-brand-dark">Starting at {category.startingPrice}</p>
+          ) : null}
         </div>
 
         {category.slug === 'flooring' ? (
@@ -117,8 +120,8 @@ export default async function CategoryPage({ params }: PageProps) {
                     <Megaphone className="size-5" aria-hidden="true" />
                     New color drop · Coming soon
                   </p>
-                  <h2 className="mt-3 text-3xl font-black leading-tight tracking-normal text-white sm:text-4xl">Pick your color. Lock in the $30 launch price.</h2>
-                  <p className="mt-3 max-w-xl leading-7 text-background/75">Dual Gray and Dual Brown are arriving soon for repairs, sheds, garages, and value-focused roofing projects. Text us now to reserve your preferred color.</p>
+                  <h2 className="mt-3 text-3xl font-black leading-tight tracking-normal text-white sm:text-4xl">Two fresh colors are landing. Claim yours for just $30 a bundle.</h2>
+                  <p className="mt-3 max-w-xl leading-7 text-background/75">Get dependable coverage without overspending. Dual Brown and Dual Gray are coming soon at just $30 a bundle—text us now to reserve your color.</p>
                 </div>
                 <div className="w-fit shrink-0 rotate-1 rounded-xl border border-brand/50 bg-brand px-6 py-4 text-foreground shadow-card lg:text-center">
                   <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wider lg:justify-center">
@@ -132,18 +135,27 @@ export default async function CategoryPage({ params }: PageProps) {
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 {[
-                  { name: 'Dual Gray', swatch: 'from-slate-700 via-slate-500 to-slate-300', detail: 'Cool, clean, and easy to match' },
-                  { name: 'Dual Brown', swatch: 'from-stone-800 via-amber-800 to-stone-400', detail: 'Warm, classic, and naturally versatile' },
+                  { name: 'Dual Brown', image: '/product-images/roofing-dual-brown.jpg', detail: 'Warm, classic, and naturally versatile' },
+                  { name: 'Dual Gray', image: '/product-images/roofing-dual-gray.jpg', detail: 'Cool, clean, and easy to match' },
                 ].map((color) => (
-                  <div key={color.name} className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/8 p-4 shadow-card backdrop-blur-sm">
-                    <span className={`size-14 shrink-0 rounded-lg bg-gradient-to-br ${color.swatch} ring-2 ring-white/10`} aria-hidden="true" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-lg font-black text-white">{color.name}</p>
-                      <p className="mt-0.5 text-sm text-background/65">{color.detail}</p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className="font-mono text-xl font-black text-brand">$30</p>
-                      <p className="text-xs font-bold text-background/60">/ bundle</p>
+                  <div key={color.name} className="overflow-hidden rounded-xl border border-white/10 bg-white/8 shadow-card backdrop-blur-sm">
+                    <Image
+                      src={color.image}
+                      alt={`${color.name} architectural asphalt shingles`}
+                      width={467}
+                      height={447}
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                      className="h-52 w-full object-cover"
+                    />
+                    <div className="flex items-center gap-4 p-4">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-lg font-black text-white">{color.name}</p>
+                        <p className="mt-0.5 text-sm text-background/65">{color.detail}</p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <p className="font-mono text-xl font-black text-brand">$30</p>
+                        <p className="text-xs font-bold text-background/60">/ bundle</p>
+                      </div>
                     </div>
                   </div>
                 ))}
