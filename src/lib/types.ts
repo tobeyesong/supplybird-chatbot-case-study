@@ -15,6 +15,8 @@ export type Product = {
   in_stock: boolean
   featured: boolean
   created_at: string | null
+  display_detail?: string
+  availability_note?: string
 }
 
 export type Category = {

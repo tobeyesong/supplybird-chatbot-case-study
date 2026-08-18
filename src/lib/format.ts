@@ -20,11 +20,24 @@ export function formatUnitPrice(price: number, priceUnit: string) {
   return `${amount} / ${priceUnits[priceUnit] ?? priceUnit.replaceAll('_', ' ')}`
 }
 
-export function formatPrice(product: Pick<Product, 'price' | 'price_unit'>) {
+export function formatPrice(product: Pick<Product, 'price' | 'price_unit' | 'coverage_per_box' | 'coverage_unit'>) {
+  if (product.price <= 0) return 'Contact for pricing'
+
+  if (product.coverage_per_box && product.coverage_unit === 'sq_ft') {
+    if (product.price_unit === 'sq_ft') {
+      return `${formatUnitPrice(product.price, 'sq_ft')} · ${formatUnitPrice(product.price * product.coverage_per_box, 'box')}`
+    }
+
+    if (product.price_unit === 'box') {
+      return `${formatUnitPrice(product.price / product.coverage_per_box, 'sq_ft')} · ${formatUnitPrice(product.price, 'box')}`
+    }
+  }
+
   return formatUnitPrice(product.price, product.price_unit)
 }
 
-export function formatCoverage(product: Pick<Product, 'coverage_per_box' | 'coverage_unit'>) {
+export function formatCoverage(product: Pick<Product, 'coverage_per_box' | 'coverage_unit' | 'display_detail'>) {
+  if (product.display_detail) return product.display_detail
   if (!product.coverage_per_box) return 'Ask for coverage'
 
   const unit = product.coverage_unit === 'ln_ft' ? 'ln.ft.' : 'sq.ft.'

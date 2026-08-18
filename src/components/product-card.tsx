@@ -17,14 +17,19 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="mt-4 flex items-start justify-between gap-4 text-base font-bold text-foreground">
         <h3 className="min-w-0 leading-6">{product.title}</h3>
-        <p className="shrink-0 font-mono">{formatPrice(product)}</p>
+        <p className="max-w-44 shrink-0 text-right font-mono text-sm leading-5 sm:max-w-48">{formatPrice(product)}</p>
       </div>
       <p className="mt-1 text-base italic text-muted sm:text-sm">{formatCoverage(product)}</p>
+      {product.availability_note ? (
+        <p className="mt-3 inline-flex rounded-full bg-brand px-3 py-1 text-xs font-black uppercase tracking-wide text-foreground">
+          {product.availability_note}
+        </p>
+      ) : null}
       <p
         className={
           product.in_stock
-            ? 'mt-3 inline-flex rounded-full bg-success-soft px-3 py-1 text-xs font-bold text-success'
-            : 'mt-3 inline-flex rounded-full bg-warning-soft px-3 py-1 text-xs font-bold text-warning'
+            ? 'mt-3 flex w-fit rounded-full bg-success-soft px-3 py-1 text-xs font-bold text-success'
+            : 'mt-3 flex w-fit rounded-full bg-warning-soft px-3 py-1 text-xs font-bold text-warning'
         }
       >
         {product.in_stock ? 'In stock' : 'Ask availability'}

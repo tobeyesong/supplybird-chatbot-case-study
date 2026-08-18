@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, MessageSquare } from 'lucide-react'
+import { ArrowLeft, DoorOpen, MessageSquare } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { CoverageCalculator } from '@/components/coverage-calculator'
 import { ProductCard } from '@/components/product-card'
@@ -76,6 +76,17 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
                 <h1 className="mt-5 text-4xl font-black tracking-normal md:text-6xl">{product.title}</h1>
                 <p className="mt-4 text-lg leading-8 text-muted">{product.description}</p>
+                {product.availability_note ? (
+                  <aside className="mt-6 flex items-center gap-4 rounded-lg border-2 border-brand bg-brand-soft p-4 text-foreground shadow-card" aria-label="Door handing availability">
+                    <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-foreground">
+                      <DoorOpen className="size-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-wider text-brand-dark">Availability</p>
+                      <p className="mt-1 text-xl font-black">{product.availability_note}</p>
+                    </div>
+                  </aside>
+                ) : null}
                 <p className="mt-6 font-mono text-2xl font-black text-foreground">{formatPrice(product)}</p>
               </div>
 
