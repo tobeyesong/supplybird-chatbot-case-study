@@ -22,7 +22,7 @@ export const business = {
   hours: 'Appointment only — no set business hours',
   appointmentNotice: 'Please do not arrive without a confirmed appointment, as we do not maintain set business hours and want to ensure someone is available to assist you.',
   paymentMethods: ['Cash', 'Zelle', 'Card'],
-  paymentNotice: 'Card payments include a 3% processing fee and require valid photo ID. Use cash or Zelle to avoid fees.',
+  paymentNotice: 'Card payments are subject to a 3% fee and require valid photo ID. Use cash or Zelle to avoid fees.',
   phoneDisplay: formatPhoneDisplay(phoneNumber),
   phoneNumber,
   textDisplay: formatPhoneDisplay(textNumber),
