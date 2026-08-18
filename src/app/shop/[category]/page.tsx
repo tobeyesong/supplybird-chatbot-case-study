@@ -128,15 +128,24 @@ export default async function CategoryPage({ params }: PageProps) {
                     <Sparkles className="size-4" aria-hidden="true" />
                     Launch price
                   </p>
-                  <p className="mt-1 font-mono text-4xl font-black leading-none">$30</p>
-                  <p className="mt-1 text-sm font-black">per bundle</p>
+                  <div className="mt-2 flex items-end gap-4">
+                    <div>
+                      <p className="font-mono text-4xl font-black leading-none">$30</p>
+                      <p className="mt-1 text-sm font-black">per bundle</p>
+                    </div>
+                    <div className="border-l border-foreground/25 pl-4">
+                      <p className="font-mono text-3xl font-black leading-none">$90</p>
+                      <p className="mt-1 text-sm font-black">per square</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 border-t border-foreground/20 pt-2 text-xs font-bold">3 bundles = 1 roofing square</p>
                 </div>
               </div>
 
               <div className="mt-7 grid gap-3 sm:grid-cols-2">
                 {[
-                  { name: 'Dual Brown', image: '/product-images/roofing-dual-brown.jpg', detail: 'Warm, classic, and naturally versatile' },
-                  { name: 'Dual Gray', image: '/product-images/roofing-dual-gray.jpg', detail: 'Cool, clean, and easy to match' },
+                  { name: 'Dual Brown', image: '/product-images/roofing-dual-brown.jpg', detail: 'Warm, classic, and naturally versatile', stock: 200 },
+                  { name: 'Dual Gray', image: '/product-images/roofing-dual-gray.jpg', detail: 'Cool, clean, and easy to match', stock: 300 },
                 ].map((color) => (
                   <div key={color.name} className="overflow-hidden rounded-xl border border-white/10 bg-white/8 shadow-card backdrop-blur-sm">
                     <Image
@@ -151,6 +160,7 @@ export default async function CategoryPage({ params }: PageProps) {
                       <div className="min-w-0 flex-1">
                         <p className="text-lg font-black text-white">{color.name}</p>
                         <p className="mt-0.5 text-sm text-background/65">{color.detail}</p>
+                        <p className="mt-2 text-sm font-black text-brand">{color.stock} bundles coming soon</p>
                       </div>
                       <div className="shrink-0 text-right">
                         <p className="font-mono text-xl font-black text-brand">$30</p>
