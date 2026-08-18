@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, BadgePercent, Clock, DoorOpen, Hammer, Layers, MapPin, MessageSquare, Package, Phone } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
+import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { ProductCard } from '@/components/product-card'
 import { business, phoneHref, textHref } from '@/lib/business'
 import { getCategoriesWithSettings, getProducts } from '@/lib/catalog'
@@ -143,6 +144,7 @@ export default async function HomePage() {
                   <Phone className="size-5 text-brand" aria-hidden="true" />
                   {business.phoneDisplay}
                 </a>
+                <MapDirectionsLinks className="pt-2" />
               </div>
             </div>
             <div className="rounded-lg bg-surface-warm p-5">

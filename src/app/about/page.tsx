@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { CheckCircle2, Clock, MapPin, MessageSquare, PackageSearch, Ruler } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
+import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { business, textHref } from '@/lib/business'
 
 export const metadata: Metadata = {
@@ -86,6 +87,7 @@ export default function AboutPage() {
             <MapPin className="size-6 text-brand" aria-hidden="true" />
             <h2 className="mt-5 text-xl font-black">Location</h2>
             <p className="mt-2 leading-7 text-muted">{business.address}</p>
+            <MapDirectionsLinks className="mt-5" />
           </div>
           <div className="surface-card p-5 md:p-6">
             <Clock className="size-6 text-brand" aria-hidden="true" />

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Clock, MapPin, Phone } from 'lucide-react'
+import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { business, phoneHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
 
@@ -45,6 +46,7 @@ export function SiteFooter() {
               <Phone className="size-4 text-brand" aria-hidden="true" />
               {business.phoneDisplay}
             </a>
+            <MapDirectionsLinks variant="dark" className="pt-2" />
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown, DoorOpen, Hammer, Info, Layers, Menu, MessageCircle, MessageSquare, Package, Phone, X } from 'lucide-react'
 import { useState } from 'react'
-import { business, phoneHref, textHref } from '@/lib/business'
+import { business, googleMapsHref, phoneHref, textHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
 import type { ProductCategory } from '@/lib/types'
 
@@ -29,7 +29,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
       <div className="bg-foreground text-background">
         <div className="page-container flex items-center justify-between gap-4 py-2 text-sm">
-          <p className="hidden text-background/78 md:block">{business.address}</p>
+          <a href={googleMapsHref()} target="_blank" rel="noopener noreferrer" className="hidden text-background/78 hover:text-background md:block">
+            {business.address}
+          </a>
           <p className="text-background/78">{business.hours}</p>
           <a href={phoneHref()} className="hidden items-center gap-2 font-semibold text-background md:inline-flex">
             <Phone className="size-4 text-brand" aria-hidden="true" />

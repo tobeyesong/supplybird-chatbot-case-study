@@ -33,6 +33,14 @@ export function phoneHref() {
   return `tel:${business.phoneNumber}`
 }
 
+export function googleMapsHref() {
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(business.address)}`
+}
+
+export function appleMapsHref() {
+  return `https://maps.apple.com/?daddr=${encodeURIComponent(business.address)}&dirflg=d`
+}
+
 export function textHref(body?: string) {
   const encodedBody = body ? `?body=${encodeURIComponent(body)}` : ''
   return `sms:${business.textNumber}${encodedBody}`
