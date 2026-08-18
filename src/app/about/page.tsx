@@ -7,8 +7,24 @@ import { MapDirectionsLinks } from '@/components/map-directions-links'
 import { business, textHref } from '@/lib/business'
 
 export const metadata: Metadata = {
-  title: 'About',
-  description: 'Learn about ModHaus, an Orange County, California building supply reseller.',
+  title: 'About Our Santa Ana Building Supply Store',
+  description: 'Learn how ModHaus helps Orange County contractors, landlords, and homeowners find closeout flooring, doors, roofing, and building supplies by appointment.',
+  alternates: {
+    canonical: '/about',
+  },
+  openGraph: {
+    type: 'website',
+    url: '/about',
+    title: 'About ModHaus Building Supply in Santa Ana',
+    description: 'Closeout flooring, doors, roofing, and building supplies for Orange County projects, available by appointment.',
+    images: ['/product-images/mohawk-luxury-vinyl-plank-1.jpg'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About ModHaus Building Supply in Santa Ana',
+    description: 'Closeout flooring, doors, roofing, and building supplies for Orange County projects, available by appointment.',
+    images: ['/product-images/mohawk-luxury-vinyl-plank-1.jpg'],
+  },
 }
 
 const buyingSteps = [

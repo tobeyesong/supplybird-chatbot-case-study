@@ -6,9 +6,10 @@ import { ChatOpenButton } from '@/components/chat-open-button'
 import { CoverageCalculator } from '@/components/coverage-calculator'
 import { ProductCard } from '@/components/product-card'
 import { ProductGallery } from '@/components/product-gallery'
-import { textHref } from '@/lib/business'
+import { business, textHref } from '@/lib/business'
 import { formatCoverage, formatPrice } from '@/lib/format'
 import { getProduct, getRelatedProducts, isProductCategory } from '@/lib/catalog'
+import { absoluteUrl } from '@/lib/site-url'
 
 export const revalidate = 60
 
@@ -29,9 +30,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Product' }
   }
 
+  const canonicalPath = `/shop/${product.category}/${product.slug}`
+  const primaryImage = product.images[0] ? absoluteUrl(product.images[0]) : undefined
+
   return {
     title: product.title,
     description: product.description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      type: 'website',
+      url: canonicalPath,
+      title: product.title,
+      description: product.description,
+      images: primaryImage ? [{ url: primaryImage, alt: product.title }] : [],
+    },
+    twitter: {
+      card: primaryImage ? 'summary_large_image' : 'summary',
+      title: product.title,
+      description: product.description,
+      images: primaryImage ? [primaryImage] : [],
+    },
   }
 }
 
@@ -47,9 +67,71 @@ export default async function ProductPage({ params }: PageProps) {
 
   const images = product.images.length ? product.images : ['/supplybird-assets/flooring.png']
   const relatedProducts = await getRelatedProducts(product)
+  const canonicalUrl = absoluteUrl(`/shop/${product.category}/${product.slug}`)
+  const boxPrice = product.price_unit === 'sq_ft' && product.coverage_per_box ? product.price * product.coverage_per_box : product.price
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    '@id': `${canonicalUrl}#product`,
+    name: product.title,
+    description: product.description,
+    image: images.map(absoluteUrl),
+    sku: product.id,
+    category: product.category,
+    offers:
+      boxPrice > 0
+        ? {
+            '@type': 'Offer',
+            url: canonicalUrl,
+            priceCurrency: 'USD',
+            price: Number(boxPrice.toFixed(2)),
+            availability: product.in_stock ? 'https://schema.org/LimitedAvailability' : 'https://schema.org/OutOfStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            seller: {
+              '@type': 'Organization',
+              name: business.name,
+            },
+          }
+        : undefined,
+    additionalProperty: product.coverage_per_box
+      ? [
+          {
+            '@type': 'PropertyValue',
+            name: 'Coverage per box',
+            value: `${product.coverage_per_box} sq. ft.`,
+          },
+        ]
+      : undefined,
+  }
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: absoluteUrl('/'),
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: product.category.charAt(0).toUpperCase() + product.category.slice(1),
+        item: absoluteUrl(`/shop/${product.category}`),
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.title,
+        item: canonicalUrl,
+      },
+    ],
+  }
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
       <section className="section-y">
         <div className="page-container">
           <Link href={`/shop/${product.category}`} className="inline-flex items-center gap-2 text-sm font-bold text-muted hover:text-foreground">

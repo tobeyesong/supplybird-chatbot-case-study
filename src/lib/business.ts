@@ -18,6 +18,13 @@ export const business = {
   name: 'ModHaus',
   tagline: 'Flooring, doors, roofing, and home supply closeouts.',
   address: '1516 E Edinger Ave Ste D, Santa Ana, CA 92705',
+  addressDetails: {
+    streetAddress: '1516 E Edinger Ave Ste D',
+    addressLocality: 'Santa Ana',
+    addressRegion: 'CA',
+    postalCode: '92705',
+    addressCountry: 'US',
+  },
   city: 'Santa Ana, CA 92705',
   hours: 'Appointment only — no set business hours',
   appointmentNotice: 'Please do not arrive without a confirmed appointment, as we do not maintain set business hours and want to ensure someone is available to assist you.',

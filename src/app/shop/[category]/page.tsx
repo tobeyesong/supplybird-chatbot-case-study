@@ -23,8 +23,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${category.name} Products`,
-    description: category.description,
+    title: `${category.name} Deals in Santa Ana, CA`,
+    description: `${category.description} Browse current ModHaus inventory for Orange County projects and confirm pickup by appointment.`,
+    alternates: {
+      canonical: `/shop/${category.slug}`,
+    },
+    openGraph: {
+      type: 'website',
+      url: `/shop/${category.slug}`,
+      title: `${category.name} Deals in Santa Ana, CA`,
+      description: category.description,
+      images: [{ url: category.image, alt: `${category.name} available from ModHaus in Santa Ana` }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${category.name} Deals in Santa Ana, CA`,
+      description: category.description,
+      images: [category.image],
+    },
   }
 }
 
