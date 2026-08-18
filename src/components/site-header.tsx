@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronDown, Hammer, Info, Layers, Menu, MessageCircle, MessageSquare, Package, Phone, Warehouse, X } from 'lucide-react'
+import { ChevronDown, DoorOpen, Hammer, Info, Layers, Menu, MessageCircle, MessageSquare, Package, Phone, X } from 'lucide-react'
 import { useState } from 'react'
 import { business, phoneHref, textHref } from '@/lib/business'
 import { categories } from '@/lib/catalog-data'
@@ -11,7 +11,7 @@ import type { ProductCategory } from '@/lib/types'
 
 const categoryIcons = {
   flooring: Layers,
-  decking: Warehouse,
+  doors: DoorOpen,
   roofing: Hammer,
   other: Package,
 } satisfies Record<ProductCategory, typeof Layers>

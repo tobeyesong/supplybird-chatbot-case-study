@@ -13,7 +13,7 @@ const buyingSteps = [
   {
     step: '01',
     title: 'Browse current categories',
-    description: 'Start with flooring, decking, roofing, or other building supply closeouts and compare the available listings.',
+    description: 'Start with flooring, doors, roofing, or other building supply closeouts and compare the available listings.',
   },
   {
     step: '02',
@@ -54,7 +54,7 @@ export default function AboutPage() {
             <p className="text-sm font-bold uppercase tracking-wide text-brand-dark">{business.city}</p>
             <h1 className="mt-4 text-4xl font-black tracking-normal md:text-6xl">Local building supply inventory without the big-box runaround.</h1>
             <p className="mt-6 text-lg leading-8 text-muted">
-              ModHaus helps contractors, landlords, and homeowners find practical closeout materials for flooring, decking, roofing, windows,
+              ModHaus helps contractors, landlords, and homeowners find practical closeout materials for flooring, doors, roofing, windows,
               appliances, and job-site supplies.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -68,8 +68,8 @@ export default function AboutPage() {
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-surface-warm shadow-card">
             <Image
-              src="/supplybird-assets/decking.png"
-              alt="Stacked decking inventory"
+              src="/product-images/mohawk-luxury-vinyl-plank-1.jpg"
+              alt="Mohawk luxury vinyl plank flooring available from ModHaus"
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"

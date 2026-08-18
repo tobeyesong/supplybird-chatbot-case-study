@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, BadgePercent, Clock, Hammer, Layers, MapPin, MessageSquare, Package, Phone, Warehouse } from 'lucide-react'
+import { ArrowRight, BadgePercent, Clock, DoorOpen, Hammer, Layers, MapPin, MessageSquare, Package, Phone } from 'lucide-react'
 import { ChatOpenButton } from '@/components/chat-open-button'
 import { ProductCard } from '@/components/product-card'
 import { business, phoneHref, textHref } from '@/lib/business'
@@ -9,7 +9,7 @@ import type { ProductCategory } from '@/lib/types'
 
 const categoryIcons = {
   flooring: Layers,
-  decking: Warehouse,
+  doors: DoorOpen,
   roofing: Hammer,
   other: Package,
 } satisfies Record<ProductCategory, typeof Layers>
@@ -52,7 +52,7 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-wide text-brand">Grand opening deals in {business.city}</p>
             <h1 className="mt-5 text-4xl font-black leading-[1.04] tracking-normal text-white sm:text-5xl md:text-7xl">
-              <span className="block sm:inline">Flooring, decking,</span>{' '}
+              <span className="block sm:inline">Flooring, doors,</span>{' '}
               <span className="block sm:inline">and building supplies</span>{' '}
               <span className="block sm:inline">priced for the job.</span>
             </h1>

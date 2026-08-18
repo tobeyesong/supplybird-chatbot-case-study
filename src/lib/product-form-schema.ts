@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const productCategoryValues = ['flooring', 'decking', 'roofing', 'other'] as const
+export const productCategoryValues = ['flooring', 'doors', 'roofing', 'other'] as const
 
 export const productPriceUnits = [
   ['sq_ft', 'Square foot'],

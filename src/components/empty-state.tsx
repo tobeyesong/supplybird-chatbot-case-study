@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { Hammer, Layers, Package, PackagePlus, Plus, Warehouse, type LucideIcon } from 'lucide-react'
+import { DoorOpen, Hammer, Layers, Package, PackagePlus, Plus, type LucideIcon } from 'lucide-react'
 import type { ProductCategory } from '@/lib/types'
 
 const categoryIcons = {
   flooring: Layers,
-  decking: Warehouse,
+  doors: DoorOpen,
   roofing: Hammer,
   other: Package,
 } satisfies Record<ProductCategory, LucideIcon>
@@ -14,9 +14,9 @@ const categoryCopy = {
     title: 'No flooring listed yet',
     message: 'Fresh flooring lots will appear here as inventory is added.',
   },
-  decking: {
-    title: 'No decking listed yet',
-    message: 'Deck boards and trim will show here when stock is available.',
+  doors: {
+    title: 'No doors listed yet',
+    message: 'Interior, exterior, and patio doors will appear here when stock is available.',
   },
   roofing: {
     title: 'No roofing listed yet',

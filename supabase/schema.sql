@@ -15,7 +15,7 @@ create table if not exists public.products (
   title text not null,
   slug text not null unique,
   description text not null default '',
-  category text not null check (category in ('flooring', 'decking', 'roofing', 'other')),
+  category text not null check (category in ('flooring', 'doors', 'roofing', 'other')),
   subcategory text,
   price numeric(10, 2) not null default 0,
   price_unit text not null default 'sq_ft',
@@ -26,6 +26,11 @@ create table if not exists public.products (
   featured boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.products drop constraint if exists products_category_check;
+update public.products set category = 'other' where category = 'decking';
+alter table public.products
+  add constraint products_category_check check (category in ('flooring', 'doors', 'roofing', 'other'));
 
 create index if not exists products_category_idx on public.products (category);
 create index if not exists products_featured_idx on public.products (featured);
@@ -58,11 +63,16 @@ to authenticated
 using (public.is_modhaus_owner());
 
 create table if not exists public.category_settings (
-  category text primary key check (category in ('flooring', 'decking', 'roofing', 'other')),
+  category text primary key check (category in ('flooring', 'doors', 'roofing', 'other')),
   default_price numeric(10, 2) not null default 0,
   price_unit text not null default 'sq_ft',
   updated_at timestamptz not null default now()
 );
+
+alter table public.category_settings drop constraint if exists category_settings_category_check;
+delete from public.category_settings where category = 'decking';
+alter table public.category_settings
+  add constraint category_settings_category_check check (category in ('flooring', 'doors', 'roofing', 'other'));
 
 alter table public.category_settings enable row level security;
 
@@ -88,7 +98,7 @@ with check (public.is_modhaus_owner());
 insert into public.category_settings (category, default_price, price_unit)
 values
   ('flooring', 0.99, 'sq_ft'),
-  ('decking', 1.40, 'ln_ft'),
+  ('doors', 0.00, 'unit'),
   ('roofing', 22.99, 'bundle'),
   ('other', 36.00, 'roll')
 on conflict (category) do nothing;

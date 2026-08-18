@@ -1,4 +1,4 @@
-export type ProductCategory = 'flooring' | 'decking' | 'roofing' | 'other'
+export type ProductCategory = 'flooring' | 'doors' | 'roofing' | 'other'
 
 export type Product = {
   id: string

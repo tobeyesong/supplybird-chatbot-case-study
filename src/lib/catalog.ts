@@ -83,7 +83,7 @@ export async function getCategoriesWithSettings() {
       ...category,
       default_price: setting.default_price,
       price_unit: setting.price_unit,
-      startingPrice: formatUnitPrice(setting.default_price, setting.price_unit),
+      startingPrice: setting.default_price > 0 ? formatUnitPrice(setting.default_price, setting.price_unit) : 'Contact for pricing',
     }
   })
 }

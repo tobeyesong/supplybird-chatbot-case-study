@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: `${business.name} | Building Supply Deals in Orange County, California`,
     template: `%s | ${business.name}`,
   },
-  description: 'Browse flooring, decking, roofing, windows, appliances, and job-site supply closeouts in Orange County, California.',
+  description: 'Browse flooring, doors, roofing, windows, appliances, and job-site supply closeouts in Orange County, California.',
   icons: {
     icon: '/favicon.svg',
   },

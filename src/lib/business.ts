@@ -16,7 +16,7 @@ function formatPhoneDisplay(phone: string) {
 
 export const business = {
   name: 'ModHaus',
-  tagline: 'Flooring, decking, roofing, and home supply closeouts.',
+  tagline: 'Flooring, doors, roofing, and home supply closeouts.',
   address: '1516 E Edinger Ave Ste D, Santa Ana, CA 92705',
   city: 'Santa Ana, CA 92705',
   hours: 'By appointment only',
