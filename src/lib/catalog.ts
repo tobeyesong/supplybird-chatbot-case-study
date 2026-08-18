@@ -6,6 +6,7 @@ import { formatUnitPrice } from '@/lib/format'
 import type { CategorySetting, Product, ProductCategory } from '@/lib/types'
 
 let publicSupabaseClient: SupabaseClient<Database> | null = null
+const hiddenProductSlugs = new Set(['roofing-charcoal-bundle'])
 
 function getPublicSupabaseClient() {
   const config = getSupabaseConfig()
@@ -163,7 +164,7 @@ export async function getProducts(options: { category?: ProductCategory; feature
     return fallbackFilter(options)
   }
 
-  const databaseProducts = data.map(normalizeProduct)
+  const databaseProducts = data.map(normalizeProduct).filter((product) => !hiddenProductSlugs.has(product.slug))
   const databaseIds = new Set(databaseProducts.map((product) => product.id))
   const products = [...availableFilter(options).filter((product) => !databaseIds.has(product.id)), ...databaseProducts]
 
@@ -171,6 +172,8 @@ export async function getProducts(options: { category?: ProductCategory; feature
 }
 
 export async function getProduct(category: ProductCategory, slug: string) {
+  if (hiddenProductSlugs.has(slug)) return null
+
   const supabase = getPublicSupabaseClient()
 
   if (!supabase) {
