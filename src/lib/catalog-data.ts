@@ -45,6 +45,29 @@ export const categories: Category[] = [
 
 export const availableProducts: Product[] = [
   {
+    id: 'home-decorators-akamu-koa-waterproof-vinyl-plank',
+    title: 'Home Decorators Collection Akamu Koa Waterproof Vinyl Plank',
+    slug: 'home-decorators-akamu-koa-waterproof-vinyl-plank',
+    description: 'Warm koa-look waterproof vinyl plank flooring from Home Decorators Collection. Each box includes ten 7 in. x 48 in. planks covering 23.77 sq. ft., with a 5 mm thickness, durable 12 mil wear layer, attached underlayment, and easy click-lock installation. Backed by a limited lifetime residential warranty and a 10-year commercial warranty. A total of 115 boxes provides 2,733.55 sq. ft. of available coverage.',
+    category: 'flooring',
+    subcategory: 'vinyl',
+    price: 30,
+    price_unit: 'box',
+    coverage_per_box: 23.77,
+    coverage_unit: 'sq_ft',
+    images: [
+      '/product-images/home-decorators-akamu-koa-vinyl-plank-1.jpg',
+      '/product-images/home-decorators-akamu-koa-vinyl-plank-2.jpg',
+      '/product-images/home-decorators-akamu-koa-vinyl-plank-3.jpg',
+      '/product-images/home-decorators-akamu-koa-vinyl-plank-4.jpg',
+      '/product-images/home-decorators-akamu-koa-vinyl-plank-5.jpg',
+    ],
+    in_stock: true,
+    featured: true,
+    created_at: '2026-08-18T16:00:00.000Z',
+    availability_note: '115 Boxes Available · 2,733.55 Sq. Ft. Total',
+  },
+  {
     id: 'lifeproof-baileys-beach-oak-xl-vinyl-plank',
     title: "LifeProof Bailey's Beach Oak XL Vinyl Plank",
     slug: 'lifeproof-baileys-beach-oak-xl-vinyl-plank',
